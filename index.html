@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.05.5</title>
+<title>12Tails Arena PVP - Rev.05.6</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -60,8 +60,10 @@
   .btn-out { background: rgba(245, 90, 66, 0.1); color: var(--red); border: 1px solid rgba(245, 90, 66, 0.3); }
   .active-in { background: var(--green) !important; color: #000 !important; }
 
-  .player-tag { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-darker); padding: 6px 10px; border-radius: 8px; margin-bottom: 5px; font-size: 0.75rem; border-left: 3px solid var(--gold); }
+  .player-tag { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-darker); padding: 6px 10px; border-radius: 8px; margin-bottom: 5px; font-size: 0.75rem; border-left: 3px solid var(--gold); position: relative; width: 100%; }
   .player-name { font-weight: bold; color: #fff; }
+  
+  .btn-admin-del { position: absolute; right: 5px; top: 5px; background: var(--red); color: white; border: none; border-radius: 4px; font-size: 0.6rem; cursor: pointer; padding: 2px 4px; }
 
   .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: bold; display: none; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   .admin-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 12px; margin-bottom: 8px; border-radius: 12px; border: 1px solid var(--border); }
@@ -70,7 +72,7 @@
 <body>
 
 <div id="loading-page" class="page active" style="align-items: center; justify-content: center;">
-  <div style="font-family:Cinzel; color:var(--gold); font-size:1.5rem;">LOADING ARENA...</div>
+  <div style="font-family:Cinzel; color:var(--gold); font-size:1.5rem;">ARENA SYSTEM LOADING...</div>
 </div>
 
 <div id="auth-page" class="page">
@@ -114,15 +116,15 @@
   </div>
 
   <div id="view-arena" class="main">
-    <div class="section-label">1. เลือกตัวละคร</div>
+    <div class="section-label"><b>1. เลือกตัวละคร</b></div>
     <div class="char-grid" id="char-list"></div>
-    <div class="section-label">3. เลือกทีม</div>
+    <div class="section-label"><b>3. เลือกทีม</b></div>
     <div class="team-grid" id="team-list">
       <div class="team-card" id="team-1" onclick="setTeam('1')">ทีม 1</div>
       <div class="team-card" id="team-2" onclick="setTeam('2')">ทีม 2</div>
       <div class="team-card" id="team-3" onclick="setTeam('3')">ทีม 3</div>
     </div>
-    <div class="section-label">2. ตารางเวลา / ลงชื่อ</div>
+    <div class="section-label"><b>2. ตารางเวลา / ลงชื่อ</b></div>
     <div class="table-wrapper">
       <table>
         <thead><tr><th>วัน</th><th>19:00 - 20:00</th><th>20:00 - 21:00</th><th>21:00 - 22:00</th><th>23:00 - 00:00</th><th>00:00 - 01:00</th></tr></thead>
@@ -136,15 +138,16 @@
   </div>
 
   <div id="view-admin" class="main" style="display:none">
-    <div class="section-label">🛡️ จัดการผู้ใช้งาน</div>
+    <div class="section-label">🛡️ จัดการผู้ใช้งาน (Admin)</div>
     <div id="admin-user-list"></div>
   </div>
 
   <div id="view-profile" class="main" style="display:none">
     <div class="auth-box" style="margin: 0 auto;">
       <div class="section-label">ตั้งค่าบัญชี</div>
-      <div class="input-group"><input type="text" id="p-nick" placeholder="เปลี่ยนชื่อเล่น"></div>
-      <div class="input-group"><input type="password" id="p-pass" placeholder="รหัสผ่านใหม่ (ว่างไว้ถ้าไม่เปลี่ยน)"><span class="toggle-pass" onclick="togglePass('p-pass')">👁️</span></div>
+      <div class="input-group">ชื่อเล่น: <input type="text" id="p-nick"></div>
+      <div class="input-group">เบอร์โทร: <input type="tel" id="p-phone"></div>
+      <div class="input-group">รหัสผ่านใหม่: <input type="password" id="p-pass" placeholder="ว่างไว้ถ้าไม่เปลี่ยน"><span class="toggle-pass" onclick="togglePass('p-pass')">👁️</span></div>
       <button class="btn-primary" onclick="updateProfile()">💾 บันทึกการแก้ไข</button>
       <button class="btn-primary" style="background:#333; color:white;" onclick="switchView('arena')">ย้อนกลับ</button>
     </div>
@@ -168,6 +171,7 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 let user = localStorage.getItem('raidUser');
 let nickname = localStorage.getItem('raidNick') || '';
+let phone = localStorage.getItem('raidPhone') || '';
 let signups = [];
 let selectedChar = null;
 let selectedTeam = null;
@@ -192,7 +196,6 @@ async function sync() {
 
 supabase.channel('any').on('postgres_changes', {event:'*', schema:'public', table:'signups'}, sync).subscribe();
 
-// Navigation & Tabs
 window.switchTab = (t) => {
   document.getElementById('login-form').style.display = t==='login'?'block':'none';
   document.getElementById('reg-form').style.display = t==='register'?'block':'none';
@@ -210,81 +213,87 @@ window.switchView = (v) => {
 
 window.togglePass = (id) => { const i = document.getElementById(id); i.type = i.type==='password'?'text':'password'; };
 
-// Auth Actions
 window.doLogin = async () => {
   const u = document.getElementById('l-user').value.trim();
   const p = document.getElementById('l-pass').value;
   if(u==='admin'&&p==='admingun'){
-    localStorage.setItem('raidUser','admin'); localStorage.setItem('raidNick','Admin');
+    localStorage.setItem('raidUser','admin'); localStorage.setItem('raidNick','Admin Gun');
     location.reload(); return;
   }
   const {data} = await supabase.from('users').select('*').eq('username',u).eq('password',btoa(p)).single();
   if(data){
     localStorage.setItem('raidUser',u); localStorage.setItem('raidNick',data.nickname);
     localStorage.setItem('raidPhone',data.phone); location.reload();
-  } else msg("Username หรือ Password ไม่ถูกต้อง","red");
+  } else msg("ไอดีหรือรหัสผ่านไม่ถูกต้อง","red");
 };
 
 window.doRegister = async () => {
   const u=document.getElementById('r-user').value.trim(), n=document.getElementById('r-nick').value.trim(), p1=document.getElementById('r-pass').value, p2=document.getElementById('r-pass2').value, ph=document.getElementById('r-phone').value.trim();
   if(!u || !n || !p1) { msg("กรุณากรอกข้อมูลให้ครบ","red"); return; }
-  if(p1!==p2){ msg("Password ไม่ตรงกัน","red"); return; }
+  if(p1!==p2){ msg("รหัสผ่านยืนยันไม่ตรงกัน","red"); return; }
   const {error} = await supabase.from('users').insert([{username:u,password:btoa(p1),nickname:n,phone:ph}]);
-  if(!error){ alert("สมัครสมาชิกสำเร็จ!"); switchTab('login'); } else msg("Username นี้ถูกใช้ไปแล้ว","red");
+  if(!error){ alert("สมัครสำเร็จ!"); switchTab('login'); } else msg("Username นี้มีผู้ใช้แล้ว","red");
 };
 
 window.doLogout = () => { localStorage.clear(); location.reload(); };
 
-// Profile Actions
 window.openProfile = () => {
   document.getElementById('p-nick').value = nickname;
+  document.getElementById('p-phone').value = localStorage.getItem('raidPhone') || '';
   switchView('profile');
 };
 
 window.updateProfile = async () => {
   const newNick = document.getElementById('p-nick').value.trim();
+  const newPhone = document.getElementById('p-phone').value.trim();
   const newPass = document.getElementById('p-pass').value;
-  if(!newNick) return alert("กรุณาระบุชื่อเล่น");
-  const upData = { nickname: newNick };
+  const upData = { nickname: newNick, phone: newPhone };
   if(newPass) upData.password = btoa(newPass);
   const { error } = await supabase.from('users').update(upData).eq('username', user);
   if(!error) {
     localStorage.setItem('raidNick', newNick);
-    alert("อัปเดตข้อมูลสำเร็จ!");
-    location.reload();
-  } else { alert("เกิดข้อผิดพลาดในการอัปเดต"); }
+    localStorage.setItem('raidPhone', newPhone);
+    alert("อัปเดตข้อมูลแล้ว!"); location.reload();
+  }
 };
 
-// Admin Actions
 async function loadUsersAdmin() {
   const container = document.getElementById('admin-user-list');
-  container.innerHTML = 'กำลังโหลด...';
+  container.innerHTML = 'กำลังดึงข้อมูล...';
   const { data, error } = await supabase.from('users').select('*');
-  if(error) { container.innerHTML = 'เกิดข้อผิดพลาดในการดึงข้อมูล (ตรวจสอบ RLS)'; return; }
+  if(error) { container.innerHTML = 'Error โหลดรายชื่อ'; return; }
   let h = '';
   data.forEach(u => {
     if(u.username === 'admin') return;
     h += `<div class="admin-item">
-      <span><strong>${u.username}</strong> (${u.nickname})</span>
+      <span><strong>${u.username}</strong><br><small>${u.nickname}</small><br><small>📞 ${u.phone}</small></span>
       <div>
-        <button onclick="editUserAdmin('${u.username}')" style="background:var(--cyan); border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">แก้</button>
-        <button onclick="delUserAdmin('${u.username}')" style="background:var(--red); border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-left:5px;">ลบ</button>
+        <button onclick="editUserAdmin('${u.username}','${u.nickname}','${u.phone}')" style="background:var(--cyan); border:none; padding:5px; border-radius:5px; cursor:pointer;">แก้</button>
+        <button onclick="delUserAdmin('${u.username}')" style="background:var(--red); border:none; padding:5px; border-radius:5px; cursor:pointer; margin-left:5px; color:white;">ลบ</button>
       </div>
     </div>`;
   });
-  container.innerHTML = h || 'ไม่มีผู้ใช้งานอื่น';
+  container.innerHTML = h;
 }
-window.editUserAdmin = async (target) => {
-  const n = prompt("ชื่อเล่นใหม่:");
+window.editUserAdmin = async (target, currNick, currPhone) => {
+  const n = prompt("ชื่อเล่นใหม่:", currNick);
+  const ph = prompt("เบอร์โทรใหม่:", currPhone);
   const p = prompt("รหัสผ่านใหม่ (ว่างไว้ถ้าไม่เปลี่ยน):");
   if(n === null) return;
-  const up = { nickname: n }; if(p) up.password = btoa(p);
+  const up = { nickname: n, phone: ph }; if(p) up.password = btoa(p);
   await supabase.from('users').update(up).eq('username', target);
   loadUsersAdmin();
 };
-window.delUserAdmin = async (target) => { if(confirm("ต้องการลบ User นี้?")) { await supabase.from('users').delete().eq('username', target); loadUsersAdmin(); } };
+window.delUserAdmin = async (target) => { if(confirm("ลบ User นี้?")) { await supabase.from('users').delete().eq('username', target); loadUsersAdmin(); } };
 
-// Arena Logic
+window.adminKick = async (id) => {
+  if(confirm("ลบชื่อนี้ออกจากตารางทีม?")) {
+    await supabase.from('signups').delete().eq('id', id);
+    showToast("🛡️ ลบรายชื่อออกแล้ว (Admin)");
+    sync();
+  }
+};
+
 window.setChar = (id) => { selectedChar = id; renderChars(); };
 window.setTeam = (id) => { selectedTeam = id; document.querySelectorAll('.team-card').forEach(c => c.classList.toggle('selected', c.id==='team-'+id)); };
 
@@ -307,7 +316,7 @@ function renderSchedule() {
         <div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${slotPlayers.length}/${max})</div>
         <div class="btn-action-group">
           <button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe || slotPlayers.length>=max ? 'disabled' : ''}>ลงชื่อเข้า</button>
-          <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe ? 'disabled' : ''}>ออก</button>
+          <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe ? 'disabled' : ''}>ลงชื่อออก</button>
         </div>
       </div></td>`;
     });
@@ -329,7 +338,13 @@ function renderOverview() {
       TIMES.forEach(t => {
         const key = `${day.k}_${t}`;
         const teamPlayers = signups.filter(s => s.slot_key === key && String(s.team) === String(teamNum));
-        let list = teamPlayers.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span></div>`).join('');
+        let list = teamPlayers.map(p => `
+          <div class="player-tag">
+            <span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span>
+            <span style="font-size:0.6rem; color:var(--cyan)">📞 ${p.phone || '-'}</span>
+            ${user==='admin' ? `<button class="btn-admin-del" onclick="adminKick(${p.id})">ลบ</button>` : ''}
+          </div>
+        `).join('');
         html += `<td>${list || '-'}</td>`;
       });
       html += `</tr>`;
@@ -341,7 +356,6 @@ function renderOverview() {
 
 window.handleJoin = async (key) => {
   if(!selectedChar || !selectedTeam) { showToast("⚠️ เลือกตัวละครและทีมก่อน!"); return; }
-  // เช็คว่าวันนี้ลงเวลาเดียวกันทีมอื่นไปหรือยัง
   const alreadyInThisSlot = signups.some(s => s.slot_key === key && s.username === user);
   if(alreadyInThisSlot) { showToast("⚠️ คุณลงชื่อรอบนี้ไปแล้ว!"); return; }
 
@@ -352,15 +366,13 @@ window.handleJoin = async (key) => {
     week_key: new Date().toISOString().split('T')[0]
   }]);
   if(!error) { showToast("✅ ลงชื่อสำเร็จ!"); sync(); }
-  else { showToast("❌ เกิดข้อผิดพลาด"); }
 };
 
 window.handleLeave = async (key) => {
   const has = signups.find(s => s.slot_key === key && s.username === user);
-  if(has) { await supabase.from('signups').delete().eq('id', has.id); showToast("🔔 ลงชื่อออกแล้ว"); sync(); }
+  if(has) { await supabase.from('signups').delete().eq('id', has.id); showToast("🔔 ออกแล้ว"); sync(); }
 };
 
-// Utils
 function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function msg(t,c) { const e=document.getElementById('auth-msg'); e.textContent=t; e.style.color=c; }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
