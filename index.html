@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.07</title>
+<title>12Tails Arena PVP - Rev.06.2</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -14,83 +14,96 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  body { font-family: 'Sarabun', sans-serif; background-color: var(--bg); color: var(--text); min-height: 100vh; }
 
   .page { display: none; min-height: 100vh; flex-direction: column; }
   .page.active { display: flex; }
 
-  nav { padding: 1rem 1.5rem; background: var(--bg-darker); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+  nav { padding: 1rem 1.5rem; background: var(--bg-darker); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
   .nav-tabs { display: flex; background: var(--bg-darker); border-bottom: 1px solid var(--border); }
   .nav-tab { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-dim); cursor: pointer; font-family: 'Kanit'; text-align: center; border-bottom: 2px solid transparent; transition: 0.3s; }
   .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(245, 200, 66, 0.05); }
 
-  /* ช่องประกาศ (Announcement) */
-  #announce-bar { background: linear-gradient(90deg, #1e2230, #2c3248); border: 1px solid var(--gold); margin: 1rem auto 0; padding: 12px 20px; border-radius: 12px; max-width: 1300px; width: 95%; display: flex; align-items: center; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-  #announce-text { flex: 1; font-weight: 500; color: var(--gold); font-family: 'Kanit'; }
+  /* --- ส่วนที่เพิ่มใหม่ (Announcement & Online) ในสไตล์ 06.1 --- */
+  .info-bar { max-width: 1300px; margin: 1rem auto 0; width: 95%; display: flex; flex-direction: column; gap: 10px; }
+  
+  #announce-box { background: rgba(245, 200, 66, 0.05); border: 1px solid var(--border); padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 10px; }
+  #announce-text { flex: 1; color: var(--gold); font-size: 0.9rem; font-weight: 500; }
+  
+  .online-status { font-size: 0.75rem; color: var(--green); display: flex; align-items: center; gap: 6px; padding-left: 5px; }
+  .online-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
 
-  /* คนออนไลน์ (Online Users) */
-  .online-box { background: var(--bg-darker); padding: 8px 15px; border-radius: 50px; border: 1px solid var(--green); display: flex; align-items: center; gap: 8px; font-size: 0.8rem; margin: 10px auto; max-width: 1300px; width: 95%; }
-  .dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; box-shadow: 0 0 10px var(--green); }
+  /* --- Chat Box แบบเรียบๆ ติดขอบล่าง (พับเก็บได้) --- */
+  #chat-widget { position: fixed; bottom: 0; right: 20px; width: 300px; background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: 12px 12px 0 0; z-index: 1000; transition: 0.3s; }
+  #chat-header { padding: 10px 15px; background: var(--bg-darker); cursor: pointer; display: flex; justify-content: space-between; font-family: 'Kanit'; font-size: 0.85rem; border-radius: 12px 12px 0 0; }
+  #chat-body { height: 300px; display: flex; flex-direction: column; display: none; }
+  #chat-msgs { flex: 1; overflow-y: auto; padding: 10px; font-size: 0.8rem; display: flex; flex-direction: column; gap: 6px; }
+  .chat-row { background: rgba(255,255,255,0.03); padding: 5px 8px; border-radius: 6px; }
+  .chat-u { color: var(--gold); font-weight: bold; margin-right: 5px; }
+  .chat-input-wrap { padding: 8px; border-top: 1px solid var(--border); display: flex; gap: 5px; }
+  #chat-input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: white; padding: 5px 10px; border-radius: 20px; outline: none; font-size: 0.8rem; }
 
-  /* Chat Box (Floating) */
-  #chat-container { position: fixed; bottom: 20px; right: 20px; width: 300px; height: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 15px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 1000; overflow: hidden; }
-  #chat-header { background: var(--bg-darker); padding: 10px; font-family: 'Kanit'; font-weight: bold; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-  #chat-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; background: rgba(0,0,0,0.2); }
-  .msg { background: rgba(255,255,255,0.05); padding: 6px 10px; border-radius: 8px; max-width: 90%; }
-  .msg-u { color: var(--gold); font-weight: bold; font-size: 0.75rem; }
-  #chat-input-area { padding: 10px; display: flex; gap: 5px; background: var(--bg-darker); }
-  #chat-input { flex: 1; background: var(--bg); border: 1px solid var(--border); color: white; padding: 5px 10px; border-radius: 20px; outline: none; }
-
-  /* UI อื่นๆ คงเดิม */
+  /* --- CSS เดิมของ 06.1 --- */
   #auth-page { align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at center, #1c1f2b 0%, #12141d 100%); }
   .auth-box { width: 100%; max-width: 400px; padding: 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; }
   .logo { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; text-align: center; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .input-group { position: relative; margin-bottom: 1rem; }
   input { width: 100%; background: var(--bg-darker); border: 1px solid var(--border); color: #fff; padding: 0.9rem; border-radius: 10px; outline: none; }
+  .toggle-pass { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.5; }
   .btn-primary { width: 100%; padding: 0.9rem; border: none; border-radius: 10px; background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
-  .main { padding: 1rem; max-width: 1350px; margin: 0 auto; width: 100%; }
+  .main { padding: 1.5rem; max-width: 1300px; margin: 0 auto; width: 100%; }
   .section-label { color: var(--gold); font-size: 1rem; font-family: 'Kanit'; font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
   .char-grid, .team-grid { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
   .char-card, .team-card { padding: 10px 18px; background: var(--bg-lighter); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
   .char-card.selected, .team-card.selected { border-color: var(--gold); background: rgba(245, 200, 66, 0.2); font-weight: bold; }
   .table-wrapper { overflow-x: auto; background: var(--bg-lighter); border-radius: 15px; border: 1px solid var(--border); margin-bottom: 2rem; }
   table { width: 100%; border-collapse: collapse; min-width: 1100px; table-layout: fixed; }
-  th { background: var(--bg-darker); color: var(--text-dim); padding: 15px 5px; font-family: 'Kanit'; font-size: 0.8rem; }
-  td { border: 1px solid rgba(255,255,255,0.05); padding: 10px 5px; text-align: center; vertical-align: middle; }
+  th { background: var(--bg-darker); color: var(--text-dim); font-size: 0.8rem; padding: 15px 5px; font-family: 'Kanit'; border: 1px solid rgba(255,255,255,0.05); }
+  td { border: 1px solid rgba(255,255,255,0.05); padding: 10px 5px; text-align: center; vertical-align: middle; word-wrap: break-word; }
+  th:first-child, td:first-child { width: 120px; }
+  th:not(:first-child), td:not(:first-child) { width: 196px; }
   .date-big { font-size: 0.95rem; font-weight: bold; color: var(--gold); }
-  .date-sub { font-size: 0.65rem; opacity: 0.7; }
-  .btn-sign { padding: 7px 2px; border: none; border-radius: 6px; font-family: 'Kanit'; font-size: 0.75rem; font-weight: bold; cursor: pointer; width: 48%; }
+  .date-sub { font-size: 0.65rem; opacity: 0.7; color: var(--text-dim); }
+  .today-row { background: rgba(245, 200, 66, 0.05); }
+  .slot-container { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .btn-action-group { display: flex; gap: 4px; width: 90%; }
+  .btn-sign { flex: 1; padding: 7px 2px; border: none; border-radius: 6px; font-family: 'Kanit'; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
   .btn-in { background: rgba(66, 245, 164, 0.1); color: var(--green); border: 1px solid rgba(66, 245, 164, 0.3); }
+  .btn-in:disabled { opacity: 0.15; cursor: not-allowed; }
   .btn-out { background: rgba(245, 90, 66, 0.1); color: var(--red); border: 1px solid rgba(245, 90, 66, 0.3); }
-  .active-in { background: var(--green) !important; color: #000 !important; }
-  .player-tag { background: var(--bg-darker); padding: 6px 10px; border-radius: 8px; margin: 4px auto; font-size: 0.75rem; border-left: 3px solid var(--gold); position: relative; width: 95%; text-align: left; }
-  .player-name { font-weight: bold; color: #fff; font-size: 0.8rem; }
-  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: bold; display: none; z-index: 10000; }
+  .active-in { background: var(--green) !important; color: #000 !important; border-color: var(--green); }
+  .player-tag { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-darker); padding: 6px 10px; border-radius: 8px; margin: 4px auto; font-size: 0.75rem; border-left: 3px solid var(--gold); position: relative; width: 95%; max-width: 170px; text-align: left; }
+  .player-name { font-weight: bold; color: #fff; padding-right: 20px; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+  .btn-admin-del { position: absolute; right: 4px; top: 4px; background: var(--red); color: white; border: none; border-radius: 4px; font-size: 0.6rem; cursor: pointer; padding: 2px 4px; z-index: 5; font-weight: bold; }
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: bold; display: none; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .admin-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 12px; margin-bottom: 8px; border-radius: 12px; border: 1px solid var(--border); }
 </style>
 </head>
 <body>
 
 <div id="loading-page" class="page active" style="align-items: center; justify-content: center;">
-  <div style="font-family:Cinzel; color:var(--gold); font-size:1.5rem;">ARENA LOADING...</div>
+  <div style="font-family:Cinzel; color:var(--gold); font-size:1.5rem; letter-spacing: 2px;">ARENA LOADING...</div>
 </div>
 
 <div id="auth-page" class="page">
   <div class="auth-box">
     <div class="logo">12TAILS</div>
+    <div class="tab-bar">
+      <button class="tab-btn active" id="tab-login-btn" onclick="switchTab('login')">เข้าสู่ระบบ</button>
+      <button class="tab-btn" id="tab-reg-btn" onclick="switchTab('register')">สมัครสมาชิก</button>
+    </div>
     <div id="login-form">
-      <input type="text" id="l-user" placeholder="USERNAME" style="margin-bottom:10px">
-      <input type="password" id="l-pass" placeholder="PASSWORD" style="margin-bottom:15px">
+      <div class="input-group"><input type="text" id="l-user" placeholder="USERNAME"></div>
+      <div class="input-group"><input type="password" id="l-pass" placeholder="PASSWORD"><span class="toggle-pass" onclick="togglePass('l-pass')">👁️</span></div>
       <button class="btn-primary" onclick="doLogin()">⚔️ เข้าสู่ ARENA</button>
-      <p style="text-align:center; font-size:0.8rem; cursor:pointer; color:var(--cyan)" onclick="switchTab('register')">ยังไม่มีไอดี? สมัครสมาชิกที่นี่</p>
     </div>
     <div id="reg-form" style="display:none">
-      <input type="text" id="r-user" placeholder="USERNAME" style="margin-bottom:10px">
-      <input type="text" id="r-nick" placeholder="NICKNAME" style="margin-bottom:10px">
-      <input type="password" id="r-pass" placeholder="PASSWORD" style="margin-bottom:10px">
-      <input type="password" id="r-pass2" placeholder="CONFIRM PASSWORD" style="margin-bottom:10px">
-      <input type="tel" id="r-phone" placeholder="PHONE" style="margin-bottom:15px">
+      <div class="input-group"><input type="text" id="r-user" placeholder="USERNAME"></div>
+      <div class="input-group"><input type="text" id="r-nick" placeholder="ชื่อเล่น (NICKNAME)"></div>
+      <div class="input-group"><input type="password" id="r-pass" placeholder="PASSWORD"><span class="toggle-pass" onclick="togglePass('r-pass')">👁️</span></div>
+      <div class="input-group"><input type="password" id="r-pass2" placeholder="ยืนยัน PASSWORD"><span class="toggle-pass" onclick="togglePass('r-pass2')">👁️</span></div>
+      <div class="input-group"><input type="tel" id="r-phone" placeholder="เบอร์โทรศัพท์ (0XXXXXXXXX)"></div>
       <button class="btn-primary" onclick="doRegister()">สร้างบัญชี</button>
-      <p style="text-align:center; font-size:0.8rem; cursor:pointer; color:var(--cyan)" onclick="switchTab('login')">มีไอดีแล้ว? ล็อกอิน</p>
     </div>
     <div id="auth-msg" style="text-align:center; margin-top:1rem; font-size:0.8rem;"></div>
   </div>
@@ -100,22 +113,23 @@
   <nav>
     <div style="color:var(--gold); font-weight:bold; font-family:Cinzel;">⚔️ ARENA PVP</div>
     <div style="font-size:0.85rem;">
-      <span id="n-nick" style="color:var(--gold); font-weight:bold;"></span> | 
+      <span id="n-nick" style="color:var(--gold); font-weight:bold;"></span> (<span id="n-user"></span>) | 
       <a href="javascript:void(0)" onclick="openProfile()" style="color:var(--cyan); text-decoration:none;">ตั้งค่า</a> |
       <a href="javascript:void(0)" onclick="doLogout()" style="color:var(--red); text-decoration:none;">ออก</a>
     </div>
   </nav>
 
-  <div id="announce-bar">
-    <span style="font-size:1.2rem;">📢</span>
-    <div id="announce-text">กำลังโหลดประกาศ...</div>
-    <button id="admin-edit-announce" style="display:none; background:var(--gold); border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-weight:bold;" onclick="editAnnounce()">แก้ไข</button>
-  </div>
-
-  <div class="online-box">
-    <div class="dot"></div>
-    <span id="online-count">ออนไลน์: 0 คน</span>
-    <span id="online-users" style="color:var(--text-dim); margin-left:10px; font-size:0.75rem;"></span>
+  <div class="info-bar">
+    <div id="announce-box">
+      <span>📢</span>
+      <div id="announce-text">กำลังโหลดประกาศ...</div>
+      <button id="adm-ann-btn" style="display:none; background:var(--gold); border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:0.7rem;" onclick="editAnnounce()">แก้ไข</button>
+    </div>
+    <div class="online-status">
+      <div class="online-dot"></div>
+      <span id="online-count">กำลังนับผู้เล่น...</span>
+      <span id="online-list" style="color:var(--text-dim); margin-left:5px;"></span>
+    </div>
   </div>
 
   <div class="nav-tabs">
@@ -145,22 +159,25 @@
   <div id="view-list" class="main" style="display:none"><div id="overview-content"></div></div>
   <div id="view-admin" class="main" style="display:none"><div class="section-label">🛡️ จัดการ User</div><div id="admin-user-list"></div></div>
   <div id="view-profile" class="main" style="display:none">
-    <div class="auth-box" style="margin:0 auto">
+    <div class="auth-box" style="margin: 0 auto;">
       <div class="section-label">ตั้งค่าบัญชี</div>
-      <input type="text" id="p-nick" placeholder="ชื่อเล่น" style="margin-bottom:10px">
-      <input type="tel" id="p-phone" placeholder="เบอร์โทร" style="margin-bottom:10px">
-      <input type="password" id="p-pass" placeholder="รหัสผ่านใหม่" style="margin-bottom:15px">
-      <button class="btn-primary" onclick="updateProfile()">บันทึก</button>
+      <div class="input-group">ชื่อเล่น: <input type="text" id="p-nick"></div>
+      <div class="input-group">เบอร์โทร: <input type="tel" id="p-phone"></div>
+      <div class="input-group">รหัสผ่านใหม่: <input type="password" id="p-pass" placeholder="ว่างไว้ถ้าไม่เปลี่ยน"><span class="toggle-pass" onclick="togglePass('p-pass')">👁️</span></div>
+      <button class="btn-primary" onclick="updateProfile()">💾 บันทึกการแก้ไข</button>
+      <button class="btn-primary" style="background:#333; color:white;" onclick="switchView('arena')">ย้อนกลับ</button>
     </div>
   </div>
 
-  <div id="chat-container">
-    <div id="chat-header" onclick="toggleChat()">💬 อารีน่าแชท (เรียลไทม์) <span id="chat-toggle-icon">▼</span></div>
-    <div id="chat-body" style="display:flex; flex-direction:column; height:360px;">
-      <div id="chat-messages"></div>
-      <div id="chat-input-area">
+  <div id="chat-widget">
+    <div id="chat-header" onclick="toggleChat()">
+      <span>💬 Arena Chat (Realtime)</span>
+      <span id="chat-icon">▲</span>
+    </div>
+    <div id="chat-body">
+      <div id="chat-msgs"></div>
+      <div class="chat-input-wrap">
         <input type="text" id="chat-input" placeholder="พิมพ์ข้อความ..." onkeypress="if(event.key==='Enter') sendChat()">
-        <button onclick="sendChat()" style="background:var(--gold); border:none; border-radius:50%; width:30px; height:30px; cursor:pointer;">▶</button>
       </div>
     </div>
   </div>
@@ -184,125 +201,121 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 let user = localStorage.getItem('raidUser');
 let nickname = localStorage.getItem('raidNick') || '';
-let signups = [], onlineCount = 0;
-let selectedChar = null, selectedTeam = null;
+let signups = [];
+let selectedChar = null;
+let selectedTeam = null;
 
 window.onload = async () => {
   if(user) {
+    document.getElementById('n-user').textContent = user;
     document.getElementById('n-nick').textContent = nickname;
-    if(user==='admin') document.getElementById('admin-edit-announce').style.display='block';
-    await syncAll();
+    if(user === 'admin') document.getElementById('adm-ann-btn').style.display = 'block', document.getElementById('tab-admin-btn').style.display = 'block';
+    await sync();
     setupPresence();
     showPage('app-page');
   } else { showPage('auth-page'); }
   renderChars();
 };
 
-async function syncAll() {
+async function sync() {
   const { data: s } = await supabase.from('signups').select('*'); signups = s || [];
   const { data: a } = await supabase.from('announcements').select('content').eq('id', 1).single();
   if(a) document.getElementById('announce-text').textContent = a.content;
-  
-  const { data: c } = await supabase.from('chats').select('*').order('created_at', {ascending:false}).limit(20);
-  renderChatMessages(c ? c.reverse() : []);
+  const { data: c } = await supabase.from('chats').select('*').order('created_at', {ascending:false}).limit(15);
+  renderChatMsgs(c ? c.reverse() : []);
   renderSchedule();
   if(document.getElementById('view-list').style.display !== 'none') renderOverview();
 }
 
-// 2. ระบบคนออนไลน์ (Presence)
+// Presence
 function setupPresence() {
-  const channel = supabase.channel('online_users', { config: { presence: { key: user } } });
+  const channel = supabase.channel('arena_presence', { config: { presence: { key: user } } });
   channel.on('presence', { event: 'sync' }, () => {
     const state = channel.presenceState();
     const users = Object.keys(state);
     document.getElementById('online-count').textContent = `ออนไลน์: ${users.length} คน`;
-    document.getElementById('online-users').textContent = users.join(', ');
+    document.getElementById('online-list').textContent = `(${users.join(', ')})`;
   }).subscribe(async (status) => {
-    if (status === 'SUBSCRIBED') await channel.track({ nickname: nickname, online_at: new Date().toISOString() });
+    if (status === 'SUBSCRIBED') await channel.track({ online_at: new Date().toISOString() });
   });
 }
 
-// 1. ระบบประกาศ (Admin)
-window.editAnnounce = async () => {
-  const current = document.getElementById('announce-text').textContent;
-  const next = prompt("พิมพ์ข้อความประกาศใหม่ (พิมพ์ 'ว่าง' เพื่อลบ):", current);
-  if(next === null) return;
-  const content = next === 'ว่าง' ? '' : next;
-  await supabase.from('announcements').update({ content }).eq('id', 1);
-  document.getElementById('announce-text').textContent = content || 'ไม่มีประกาศในขณะนี้';
+// Chat
+window.toggleChat = () => {
+  const b = document.getElementById('chat-body');
+  const i = document.getElementById('chat-icon');
+  const isShow = b.style.display === 'flex';
+  b.style.display = isShow ? 'none' : 'flex';
+  i.textContent = isShow ? '▲' : '▼';
 };
-
-// 3. ระบบแชท
 window.sendChat = async () => {
   const inp = document.getElementById('chat-input');
-  const msg = inp.value.trim();
-  if(!msg) return;
+  const msg = inp.value.trim(); if(!msg) return;
   inp.value = '';
   await supabase.from('chats').insert([{ username: user, nickname: nickname, message: msg }]);
 };
-
-function renderChatMessages(msgs) {
-  const container = document.getElementById('chat-messages');
-  container.innerHTML = msgs.map(m => `
-    <div class="msg">
-      <div class="msg-u">${m.nickname || m.username}</div>
-      <div style="word-break:break-word;">${m.message}</div>
-    </div>
-  `).join('');
-  container.scrollTop = container.scrollHeight;
+function renderChatMsgs(msgs) {
+  const div = document.getElementById('chat-msgs');
+  div.innerHTML = msgs.map(m => `<div class="chat-row"><span class="chat-u">${m.nickname || m.username}:</span>${m.message}</div>`).join('');
+  div.scrollTop = div.scrollHeight;
 }
 
-window.toggleChat = () => {
-  const body = document.getElementById('chat-body');
-  const icon = document.getElementById('chat-toggle-icon');
-  const isHidden = body.style.display === 'none';
-  body.style.display = isHidden ? 'flex' : 'none';
-  icon.textContent = isHidden ? '▼' : '▲';
-  document.getElementById('chat-container').style.height = isHidden ? '400px' : '40px';
+// Announcement
+window.editAnnounce = async () => {
+  const current = document.getElementById('announce-text').textContent;
+  const next = prompt("ข้อความประกาศใหม่:", current);
+  if(next !== null) {
+    await supabase.from('announcements').update({ content: next }).eq('id', 1);
+    sync();
+  }
 };
 
-// --- ฟังก์ชัน Arena เดิมที่ปรับปรุงแล้ว ---
+// Utils 06.1
+window.switchTab = (t) => { document.getElementById('login-form').style.display = t==='login'?'block':'none'; document.getElementById('reg-form').style.display = t==='register'?'block':'none'; };
+window.switchView = (v) => { document.querySelectorAll('.main').forEach(m => m.style.display='none'); document.getElementById('view-'+v).style.display='block'; document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.id==='tab-'+v+'-btn')); if(v==='list') renderOverview(); if(v==='admin') loadUsersAdmin(); };
+window.togglePass = (id) => { const i = document.getElementById(id); i.type = i.type==='password'?'text':'password'; };
+window.doLogin = async () => { const u = document.getElementById('l-user').value.trim(), p = document.getElementById('l-pass').value; if(u==='admin'&&p==='admingun'){ localStorage.setItem('raidUser','admin'); localStorage.setItem('raidNick','Admin'); location.reload(); return; } const {data} = await supabase.from('users').select('*').eq('username',u).eq('password',btoa(p)).single(); if(data){ localStorage.setItem('raidUser',u); localStorage.setItem('raidNick',data.nickname); localStorage.setItem('raidPhone',data.phone); location.reload(); } else msg("ID/Pass ผิด","red"); };
+window.doRegister = async () => { const u=document.getElementById('r-user').value.trim(), n=document.getElementById('r-nick').value.trim(), p1=document.getElementById('r-pass').value, p2=document.getElementById('r-pass2').value, ph=document.getElementById('r-phone').value.trim(); if(p1!==p2) return msg("Pass ไม่ตรง","red"); const {error} = await supabase.from('users').insert([{username:u,password:btoa(p1),nickname:n,phone:ph}]); if(!error) alert("สำเร็จ!"), switchTab('login'); else msg("Username ซ้ำ","red"); };
+window.doLogout = () => { localStorage.clear(); location.reload(); };
+window.openProfile = () => { document.getElementById('p-nick').value = nickname; document.getElementById('p-phone').value = localStorage.getItem('raidPhone'); switchView('profile'); };
+window.updateProfile = async () => { const n=document.getElementById('p-nick').value.trim(), ph=document.getElementById('p-phone').value.trim(), p=document.getElementById('p-pass').value; const up = { nickname: n, phone: ph }; if(p) up.password = btoa(p); await supabase.from('users').update(up).eq('username', user); localStorage.setItem('raidNick', n); localStorage.setItem('raidPhone', ph); alert("สำเร็จ!"); location.reload(); };
+async function loadUsersAdmin() { const {data} = await supabase.from('users').select('*'); let h = ''; data.forEach(u => { if(u.username === 'admin') return; h += `<div class="admin-item"><span><strong>${u.username}</strong> (${u.nickname})</span><div><button onclick="editUserAdmin('${u.username}','${u.nickname}','${u.phone}')" style="background:var(--cyan); border:none; padding:5px; border-radius:5px; cursor:pointer;">แก้</button><button onclick="delUserAdmin('${u.username}')" style="background:var(--red); border:none; padding:5px; border-radius:5px; cursor:pointer; margin-left:5px; color:white;">ลบ</button></div></div>`; }); document.getElementById('admin-user-list').innerHTML = h; }
+window.editUserAdmin = async (t,n,ph) => { const nn=prompt("ชื่อเล่น:",n), pp=prompt("เบอร์:",ph), pw=prompt("รหัสใหม่ (ถ้ามี):"); const up={nickname:nn,phone:pp}; if(pw) up.password=btoa(pw); await supabase.from('users').update(up).eq('username',t); loadUsersAdmin(); };
+window.delUserAdmin = async (t) => { if(confirm("ลบ?")) await supabase.from('users').delete().eq('username',t), loadUsersAdmin(); };
+window.adminKick = async (id) => { if(confirm("ลบรายชื่อ?")) await supabase.from('signups').delete().eq('id', id), sync(); };
+
+// Arena Logic 06.1
+window.setChar = (id) => { selectedChar = id; renderChars(); };
+window.setTeam = (id) => { selectedTeam = id; document.querySelectorAll('.team-card').forEach(c => c.classList.toggle('selected', c.id==='team-'+id)); };
+function getDates() { const now = new Date(); let curIdx = now.getDay() === 0 ? 7 : now.getDay(); return DAYS.map(d => { const date = new Date(); date.setDate(now.getDate() + (d.idx - curIdx)); return { ...d, dateStr: `${date.getDate()} / ${MONTHS[date.getMonth()]} / ${date.getFullYear()}`, isToday: d.idx === curIdx }; }); }
 function renderSchedule() {
-  const now = new Date(); let curIdx = now.getDay() === 0 ? 7 : now.getDay();
-  let h = '';
-  DAYS.forEach(day => {
-    const d = new Date(); d.setDate(now.getDate() + (day.idx - curIdx));
-    const ds = `${d.getDate()} / ${MONTHS[d.getMonth()]} / ${d.getFullYear()}`;
-    h += `<tr class="${day.idx===curIdx?'today-row':''}"><td><span class="date-big">${day.l}</span><br><span class="date-sub">${ds}</span></td>`;
+  const dates = getDates(); let h = '';
+  dates.forEach(day => {
+    h += `<tr class="${day.isToday?'today-row':''}"><td><span class="date-big">${day.l}</span><br><span class="date-sub">${day.dateStr}</span></td>`;
     TIMES_KEYS.forEach(t => {
       const type = (SLOTS[day.k] && SLOTS[day.k][t]) || null;
       if(!type) { h += '<td>-</td>'; return; }
       const key = `${day.k}_${t}`;
       const ps = signups.filter(s => s.slot_key === key);
       const isMe = ps.some(s => s.username === user);
-      const max = type==='77'?7:5;
-      h += `<td><div class="slot-container">
-        <div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${ps.length}/${max})</div>
-        <div style="display:flex; width:100%; gap:4px; justify-content:center;">
-          <button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=max?'disabled':''}>ลงชื่อเข้า</button>
-          <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ออก</button>
-        </div>
-      </div></td>`;
+      h += `<td><div class="slot-container"><div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${ps.length}/${type==='77'?7:5})</div><div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=(type==='77'?7:5)?'disabled':''}>ลงชื่อเข้า</button><button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ออก</button></div></div></td>`;
     });
     h += '</tr>';
   });
   document.getElementById('arena-body').innerHTML = h;
 }
-
 function renderOverview() {
-  const now = new Date(); let curIdx = now.getDay() === 0 ? 7 : now.getDay();
-  let html = '';
+  const dates = getDates(); let html = '';
   [1, 2, 3].forEach(num => {
     html += `<div class="section-label">ทีม ${num}</div><div class="table-wrapper"><table><thead><tr><th>วัน</th>`;
     TIMES_LABELS.forEach(t => html += `<th>${t}</th>`);
     html += `</tr></thead><tbody>`;
-    DAYS.forEach(day => {
-      const d = new Date(); d.setDate(now.getDate() + (day.idx - curIdx));
-      html += `<tr class="${day.idx===curIdx?'today-row':''}"><td><span style="font-weight:bold; color:var(--gold);">${day.l}</span><br><small style="opacity:0.6">${d.getDate()}/${d.getMonth()+1}</small></td>`;
+    dates.forEach(day => {
+      html += `<tr class="${day.isToday?'today-row':''}"><td><span style="font-weight:bold; color:var(--gold); font-size:0.9rem;">${day.l}</span><br><span style="font-size:0.65rem; opacity:0.7;">${day.dateStr}</span></td>`;
       TIMES_KEYS.forEach(t => {
         const key = `${day.k}_${t}`;
         const ps = signups.filter(s => s.slot_key === key && String(s.team) === String(num));
-        let list = ps.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span>${user==='admin'?`<button style="position:absolute; right:5px; top:5px; background:red; border:none; color:white; font-size:0.5rem; cursor:pointer;" onclick="adminKick(${p.id})">X</button>`:''}</div>`).join('');
+        let list = ps.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span><span style="font-size:0.65rem; color:var(--cyan)">📞 ${p.phone || '-'}</span>${user==='admin'?`<button class="btn-admin-del" onclick="adminKick(${p.id})">ลบ</button>`:''}</div>`).join('');
         html += `<td>${list || '-'}</td>`;
       });
       html += `</tr>`;
@@ -311,50 +324,19 @@ function renderOverview() {
   });
   document.getElementById('overview-content').innerHTML = html;
 }
-
-// Logic ส่วนอื่นๆ (Login, Register, Profile, Admin User Management) คงเดิมจาก Rev.05.9
-window.doLogin = async () => {
-  const u = document.getElementById('l-user').value.trim(), p = document.getElementById('l-pass').value;
-  if(u==='admin'&&p==='admingun'){ localStorage.setItem('raidUser','admin'); localStorage.setItem('raidNick','Admin'); location.reload(); return; }
-  const {data} = await supabase.from('users').select('*').eq('username',u).eq('password',btoa(p)).single();
-  if(data){ localStorage.setItem('raidUser',u); localStorage.setItem('raidNick',data.nickname); localStorage.setItem('raidPhone',data.phone); location.reload(); } else msg("Username/Password ผิด","red");
-};
-window.doRegister = async () => {
-  const u=document.getElementById('r-user').value.trim(), n=document.getElementById('r-nick').value.trim(), p1=document.getElementById('r-pass').value, p2=document.getElementById('r-pass2').value, ph=document.getElementById('r-phone').value.trim();
-  if(p1!==p2){ msg("Password ไม่ตรงกัน","red"); return; }
-  const {error} = await supabase.from('users').insert([{username:u,password:btoa(p1),nickname:n,phone:ph}]);
-  if(!error){ alert("สมัครสำเร็จ!"); location.reload(); } else msg("Username ซ้ำ","red");
-};
 window.handleJoin = async (key) => {
-  if(!selectedChar || !selectedTeam) { showToast("⚠️ เลือกตัวละครและทีมก่อน!"); return; }
+  if(!selectedChar || !selectedTeam) return showToast("⚠️ เลือกตัวละครและทีมก่อน!");
+  if(signups.some(s => s.slot_key === key && s.username === user)) return showToast("⚠️ ลงไปแล้ว!");
   await supabase.from('signups').insert([{ slot_key: key, username: user, nickname: nickname, char_id: selectedChar, char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, team: selectedTeam, phone: localStorage.getItem('raidPhone') || '', week_key: new Date().toISOString().split('T')[0] }]);
-  showToast("✅ ลงชื่อสำเร็จ!"); syncAll();
+  sync();
 };
-window.handleLeave = async (key) => {
-  const has = signups.find(s => s.slot_key === key && s.username === user);
-  if(has) { await supabase.from('signups').delete().eq('id', has.id); syncAll(); }
-};
-window.adminKick = async (id) => { if(confirm("ลบรายชื่อ?")) { await supabase.from('signups').delete().eq('id', id); syncAll(); } };
-window.doLogout = () => { localStorage.clear(); location.reload(); };
-window.switchTab = (t) => { document.getElementById('login-form').style.display = t==='login'?'block':'none'; document.getElementById('reg-form').style.display = t==='register'?'block':'none'; };
-window.switchView = (v) => { document.querySelectorAll('.main').forEach(m => m.style.display='none'); document.getElementById('view-'+v).style.display='block'; document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.id==='tab-'+v+'-btn')); if(v==='list') renderOverview(); };
-window.openProfile = () => { document.getElementById('p-nick').value = nickname; document.getElementById('p-phone').value = localStorage.getItem('raidPhone'); switchView('profile'); };
-window.updateProfile = async () => {
-  const n = document.getElementById('p-nick').value, ph = document.getElementById('p-phone').value, p = document.getElementById('p-pass').value;
-  const up = { nickname: n, phone: ph }; if(p) up.password = btoa(p);
-  await supabase.from('users').update(up).eq('username', user); localStorage.setItem('raidNick', n); localStorage.setItem('raidPhone', ph); location.reload();
-};
-function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+window.handleLeave = async (key) => { const has = signups.find(s => s.slot_key === key && s.username === user); if(has) await supabase.from('signups').delete().eq('id', has.id), sync(); };
 function msg(t,c) { const e=document.getElementById('auth-msg'); e.textContent=t; e.style.color=c; }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
 function renderChars() { document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join(''); }
-window.setChar = (id) => { selectedChar = id; renderChars(); };
-window.setTeam = (id) => { selectedTeam = id; document.querySelectorAll('.team-card').forEach(c => c.classList.toggle('selected', c.id==='team-'+id)); };
+function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
-// Realtime Listeners
-supabase.channel('global_updates').on('postgres_changes', {event:'*', schema:'public', table:'signups'}, syncAll).on('postgres_changes', {event:'*', schema:'public', table:'announcements'}, syncAll).on('postgres_changes', {event:'INSERT', schema:'public', table:'chats'}, payload => {
-  syncAll(); // หรือเขียน Logic เพิ่มข้อความใหม่โดยไม่ต้องดึงใหม่ทั้งหมดก็ได้
-}).subscribe();
+supabase.channel('arena_global').on('postgres_changes', {event:'*', schema:'public', table:'signups'}, sync).on('postgres_changes', {event:'*', schema:'public', table:'announcements'}, sync).on('postgres_changes', {event:'INSERT', schema:'public', table:'chats'}, sync).subscribe();
 </script>
 </body>
 </html>
