@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.05.6</title>
+<title>12Tails Arena PVP - Rev.05.8</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -50,6 +50,7 @@
   td { border: 1px solid rgba(255,255,255,0.03); padding: 12px; text-align: center; vertical-align: middle; }
 
   .date-big { font-size: 0.9rem; font-weight: bold; color: var(--text); }
+  .date-sub { font-size: 0.65rem; opacity: 0.6; color: var(--text-dim); }
   .today-row { background: rgba(245, 200, 66, 0.05); }
 
   .slot-container { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -60,10 +61,10 @@
   .btn-out { background: rgba(245, 90, 66, 0.1); color: var(--red); border: 1px solid rgba(245, 90, 66, 0.3); }
   .active-in { background: var(--green) !important; color: #000 !important; }
 
-  .player-tag { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-darker); padding: 6px 10px; border-radius: 8px; margin-bottom: 5px; font-size: 0.75rem; border-left: 3px solid var(--gold); position: relative; width: 100%; }
-  .player-name { font-weight: bold; color: #fff; }
+  .player-tag { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-darker); padding: 6px 10px; border-radius: 8px; margin-bottom: 5px; font-size: 0.75rem; border-left: 3px solid var(--gold); position: relative; width: 100%; min-width: 140px; }
+  .player-name { font-weight: bold; color: #fff; padding-right: 25px; text-align: left; }
   
-  .btn-admin-del { position: absolute; right: 5px; top: 5px; background: var(--red); color: white; border: none; border-radius: 4px; font-size: 0.6rem; cursor: pointer; padding: 2px 4px; }
+  .btn-admin-del { position: absolute; right: 5px; top: 5px; background: var(--red); color: white; border: none; border-radius: 4px; font-size: 0.6rem; cursor: pointer; padding: 2px 4px; z-index: 5; }
 
   .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: bold; display: none; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
   .admin-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 12px; margin-bottom: 8px; border-radius: 12px; border: 1px solid var(--border); }
@@ -171,7 +172,6 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 let user = localStorage.getItem('raidUser');
 let nickname = localStorage.getItem('raidNick') || '';
-let phone = localStorage.getItem('raidPhone') || '';
 let signups = [];
 let selectedChar = null;
 let selectedTeam = null;
@@ -286,39 +286,42 @@ window.editUserAdmin = async (target, currNick, currPhone) => {
 };
 window.delUserAdmin = async (target) => { if(confirm("ลบ User นี้?")) { await supabase.from('users').delete().eq('username', target); loadUsersAdmin(); } };
 
-window.adminKick = async (id) => {
-  if(confirm("ลบชื่อนี้ออกจากตารางทีม?")) {
-    await supabase.from('signups').delete().eq('id', id);
-    showToast("🛡️ ลบรายชื่อออกแล้ว (Admin)");
-    sync();
-  }
+window.adminKick = async (signupId) => {
+  if(!confirm("🛡️ ยืนยันการลบรายชื่อนี้ออกจากตาราง?")) return;
+  const { error } = await supabase.from('signups').delete().eq('id', signupId);
+  if(error) { showToast("❌ ลบไม่ได้: " + error.message); } 
+  else { showToast("🛡️ ลบเรียบร้อย!"); await sync(); }
 };
 
 window.setChar = (id) => { selectedChar = id; renderChars(); };
 window.setTeam = (id) => { selectedTeam = id; document.querySelectorAll('.team-card').forEach(c => c.classList.toggle('selected', c.id==='team-'+id)); };
 
-function renderSchedule() {
+function getDates() {
   const now = new Date();
   let curIdx = now.getDay() === 0 ? 7 : now.getDay();
+  return DAYS.map(d => {
+    const date = new Date();
+    date.setDate(now.getDate() + (d.idx - curIdx));
+    const ds = `${date.getDate()} / ${MONTHS[date.getMonth()]} / ${date.getFullYear()}`;
+    return { ...d, dateStr: ds, isToday: d.idx === curIdx };
+  });
+}
+
+function renderSchedule() {
+  const dates = getDates();
   let h = '';
-  DAYS.forEach(day => {
-    const d = new Date(); d.setDate(now.getDate() + (day.idx - curIdx));
-    const dateStr = `${d.getDate()} / ${MONTHS[d.getMonth()]} / ${d.getFullYear()}`;
-    h += `<tr class="${day.idx===curIdx?'today-row':''}"><td><span class="date-big">${day.l}</span><br><span style="font-size:0.6rem; opacity:0.6">${dateStr}</span></td>`;
+  dates.forEach(day => {
+    h += `<tr class="${day.isToday?'today-row':''}"><td><span class="date-big">${day.l}</span><br><span class="date-sub">${day.dateStr}</span></td>`;
     TIMES.forEach(t => {
       const type = (SLOTS[day.k] && SLOTS[day.k][t]) || null;
       if(!type) { h += '<td>-</td>'; return; }
       const key = `${day.k}_${t}`;
-      const slotPlayers = signups.filter(s => s.slot_key === key);
-      const isMe = slotPlayers.some(s => s.username === user);
+      const ps = signups.filter(s => s.slot_key === key);
+      const isMe = ps.some(s => s.username === user);
       const max = type==='77'?7:5;
-      h += `<td><div class="slot-container">
-        <div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${slotPlayers.length}/${max})</div>
-        <div class="btn-action-group">
-          <button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe || slotPlayers.length>=max ? 'disabled' : ''}>ลงชื่อเข้า</button>
-          <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe ? 'disabled' : ''}>ลงชื่อออก</button>
-        </div>
-      </div></td>`;
+      h += `<td><div class="slot-container"><div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${ps.length}/${max})</div>
+      <div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=max?'disabled':''}>ลงชื่อเข้า</button>
+      <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ลงชื่อออก</button></div></div></td>`;
     });
     h += '</tr>';
   });
@@ -326,25 +329,18 @@ function renderSchedule() {
 }
 
 function renderOverview() {
-  const now = new Date();
-  let curIdx = now.getDay() === 0 ? 7 : now.getDay();
+  const dates = getDates();
   let html = '';
-  [1, 2, 3].forEach(teamNum => {
-    html += `<div class="section-label">ทีม ${teamNum}</div><div class="table-wrapper"><table><thead><tr><th>วัน</th>`;
+  [1, 2, 3].forEach(num => {
+    html += `<div class="section-label">ทีม ${num}</div><div class="table-wrapper"><table><thead><tr><th>วัน</th>`;
     TIMES.forEach(t => html += `<th>${t}</th>`);
     html += `</tr></thead><tbody>`;
-    DAYS.forEach(day => {
-      html += `<tr><td>${day.l}</td>`;
+    dates.forEach(day => {
+      html += `<tr class="${day.isToday?'today-row':''}"><td><span style="font-weight:bold;">${day.l}</span><br><span style="font-size:0.6rem; opacity:0.6;">${day.dateStr}</span></td>`;
       TIMES.forEach(t => {
         const key = `${day.k}_${t}`;
-        const teamPlayers = signups.filter(s => s.slot_key === key && String(s.team) === String(teamNum));
-        let list = teamPlayers.map(p => `
-          <div class="player-tag">
-            <span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span>
-            <span style="font-size:0.6rem; color:var(--cyan)">📞 ${p.phone || '-'}</span>
-            ${user==='admin' ? `<button class="btn-admin-del" onclick="adminKick(${p.id})">ลบ</button>` : ''}
-          </div>
-        `).join('');
+        const ps = signups.filter(s => s.slot_key === key && String(s.team) === String(num));
+        let list = ps.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span><span style="font-size:0.6rem; color:var(--cyan)">📞 ${p.phone || '-'}</span>${user==='admin'?`<button class="btn-admin-del" onclick="adminKick(${p.id})">ลบ</button>`:''}</div>`).join('');
         html += `<td>${list || '-'}</td>`;
       });
       html += `</tr>`;
@@ -356,15 +352,8 @@ function renderOverview() {
 
 window.handleJoin = async (key) => {
   if(!selectedChar || !selectedTeam) { showToast("⚠️ เลือกตัวละครและทีมก่อน!"); return; }
-  const alreadyInThisSlot = signups.some(s => s.slot_key === key && s.username === user);
-  if(alreadyInThisSlot) { showToast("⚠️ คุณลงชื่อรอบนี้ไปแล้ว!"); return; }
-
-  const { error } = await supabase.from('signups').insert([{ 
-    slot_key: key, username: user, nickname: nickname, 
-    char_id: selectedChar, char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, 
-    team: selectedTeam, phone: localStorage.getItem('raidPhone') || '',
-    week_key: new Date().toISOString().split('T')[0]
-  }]);
+  if(signups.some(s => s.slot_key === key && s.username === user)) { showToast("⚠️ ลงรอบนี้ไปแล้ว!"); return; }
+  const { error } = await supabase.from('signups').insert([{ slot_key: key, username: user, nickname: nickname, char_id: selectedChar, char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, team: selectedTeam, phone: localStorage.getItem('raidPhone') || '', week_key: new Date().toISOString().split('T')[0] }]);
   if(!error) { showToast("✅ ลงชื่อสำเร็จ!"); sync(); }
 };
 
@@ -377,7 +366,6 @@ function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classL
 function msg(t,c) { const e=document.getElementById('auth-msg'); e.textContent=t; e.style.color=c; }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
 function renderChars() { document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join(''); }
-
 </script>
 </body>
 </html>
