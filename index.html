@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.05.9</title>
+<title>12Tails Arena PVP - Rev.06</title>
 <style>
+  /* CSS ทั้งหมดคงเดิมจาก Rev.05.9 */
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
   :root {
@@ -44,13 +45,11 @@
   .char-card, .team-card { padding: 10px 18px; background: var(--bg-lighter); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
   .char-card.selected, .team-card.selected { border-color: var(--gold); background: rgba(245, 200, 66, 0.2); font-weight: bold; }
 
-  /* Table Style Locked */
   .table-wrapper { overflow-x: auto; background: var(--bg-lighter); border-radius: 15px; border: 1px solid var(--border); margin-bottom: 2rem; }
   table { width: 100%; border-collapse: collapse; min-width: 1100px; table-layout: fixed; }
   th { background: var(--bg-darker); color: var(--text-dim); font-size: 0.8rem; padding: 15px 5px; font-family: 'Kanit'; border: 1px solid rgba(255,255,255,0.05); }
   td { border: 1px solid rgba(255,255,255,0.05); padding: 10px 5px; text-align: center; vertical-align: middle; word-wrap: break-word; }
   
-  /* Fixed Widths */
   th:first-child, td:first-child { width: 120px; }
   th:not(:first-child), td:not(:first-child) { width: 196px; }
 
@@ -169,7 +168,17 @@ const SUPABASE_URL = "https://vkxncgkipevoblwbqmlp.supabase.co";
 const SUPABASE_KEY = "sb_publishable_kZLsrPjyix00ONTZYb7ryA_NmCl8Tq_"; 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const CHARS = [{id:'wolf',emoji:'🐺',n:'หมา'},{id:'sheep',emoji:'🐑',n:'แกะ'},{id:'rabbit',emoji:'🐰',n:'ต่าย'},{id:'bat',emoji:'🦇',n:'ค้างคาว'},{id:'penguin',emoji:'🐧',n:'กวิ้น'}];
+// เพิ่มตัวละคร แมว 🐱 เข้าไปในลิสต์
+const CHARS = [
+  {id:'wolf',emoji:'🐺',n:'หมา'},
+  {id:'sheep',emoji:'🐑',n:'แกะ'},
+  {id:'rabbit',emoji:'🐰',n:'ต่าย'},
+  {id:'bat',emoji:'🦇',n:'ค้างคาว'},
+  {id:'penguin',emoji:'🐧',n:'กวิ้น'},
+  {id:'cat',emoji:'🐱',n:'แมว'} // เพิ่มบรรทัดนี้
+];
+
+// ส่วนที่เหลือของ Script คงเดิมจาก Rev.05.9
 const DAYS = [{k:'mon',l:'จันทร์',idx:1},{k:'tue',l:'อังคาร',idx:2},{k:'wed',l:'พุธ',idx:3},{k:'thu',l:'พฤหัส',idx:4},{k:'fri',l:'ศุกร์',idx:5},{k:'sat',l:'เสาร์',idx:6},{k:'sun',l:'อาทิตย์',idx:7}];
 const TIMES_LABELS = ['19:00 - 20:00','20:00 - 21:00','21:00 - 22:00','23:00 - 00:00','00:00 - 01:00'];
 const TIMES_KEYS = ['19-20','20-21','21-22','23-24','00-01'];
@@ -325,13 +334,9 @@ function renderSchedule() {
       const ps = signups.filter(s => s.slot_key === key);
       const isMe = ps.some(s => s.username === user);
       const max = type==='77'?7:5;
-      h += `<td><div class="slot-container">
-        <div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${ps.length}/${max})</div>
-        <div class="btn-action-group">
-          <button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe || ps.length>=max ? 'disabled' : ''}>ลงชื่อเข้า</button>
-          <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe ? 'disabled' : ''}>ออก</button>
-        </div>
-      </div></td>`;
+      h += `<td><div class="slot-container"><div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${ps.length}/${max})</div>
+      <div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=max?'disabled':''}>ลงชื่อเข้า</button>
+      <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ออก</button></div></div></td>`;
     });
     h += '</tr>';
   });
@@ -368,7 +373,7 @@ function renderOverview() {
 
 window.handleJoin = async (key) => {
   if(!selectedChar || !selectedTeam) { showToast("⚠️ เลือกตัวละครและทีมก่อน!"); return; }
-  if(signups.some(s => s.slot_key === key && s.username === user)) { showToast("⚠️ คุณลงชื่อรอบนี้ไปแล้ว!"); return; }
+  if(signups.some(s => s.slot_key === key && s.username === user)) { showToast("⚠️ คุณลงรอบนี้ไปแล้ว!"); return; }
 
   const { error } = await supabase.from('signups').insert([{ 
     slot_key: key, username: user, nickname: nickname, 
@@ -387,6 +392,7 @@ window.handleLeave = async (key) => {
 function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function msg(t,c) { const e=document.getElementById('auth-msg'); e.textContent=t; e.style.color=c; }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
+// ฟังก์ชัน renderChars เพื่อแสดงผลปุ่มเลือกตัวละคร
 function renderChars() { document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join(''); }
 
 </script>
