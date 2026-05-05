@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.06.1</title>
+<title>12Tails Arena PVP - Rev.06.5</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -24,59 +24,61 @@
   .nav-tab { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-dim); cursor: pointer; font-family: 'Kanit'; text-align: center; border-bottom: 2px solid transparent; transition: 0.3s; }
   .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); background: rgba(245, 200, 66, 0.05); }
 
-  #auth-page { align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at center, #1c1f2b 0%, #12141d 100%); }
-  .auth-box { width: 100%; max-width: 400px; padding: 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
-  .logo { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; text-align: center; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  
-  .tab-bar { display: flex; background: var(--bg-darker); padding: 5px; border-radius: 12px; margin-bottom: 1.5rem; }
-  .tab-btn { flex: 1; padding: 0.7rem; border: none; background: transparent; color: var(--text-dim); cursor: pointer; border-radius: 8px; font-family: 'Kanit'; }
-  .tab-btn.active { background: var(--accent); color: #000; font-weight: bold; }
+  /* Announcement & Online Info */
+  .info-bar { max-width: 1300px; margin: 1rem auto 0; width: 95%; display: flex; flex-direction: column; gap: 10px; }
+  #announce-box { background: rgba(245, 200, 66, 0.05); border: 1px solid var(--border); padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 10px; }
+  #announce-text { flex: 1; color: var(--gold); font-size: 0.9rem; font-weight: 500; }
+  .online-status { font-size: 0.75rem; color: var(--green); display: flex; align-items: center; gap: 6px; padding-left: 5px; }
+  .online-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
 
+  /* Auth UI */
+  #auth-page { align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at center, #1c1f2b 0%, #12141d 100%); }
+  .auth-box { width: 100%; max-width: 400px; padding: 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; }
+  .logo { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; text-align: center; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .input-group { position: relative; margin-bottom: 1rem; }
   input { width: 100%; background: var(--bg-darker); border: 1px solid var(--border); color: #fff; padding: 0.9rem; border-radius: 10px; outline: none; }
   .toggle-pass { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.5; }
-
   .btn-primary { width: 100%; padding: 0.9rem; border: none; border-radius: 10px; background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
+  
+  /* Arena UI */
   .main { padding: 1.5rem; max-width: 1300px; margin: 0 auto; width: 100%; }
-  .section-label { color: var(--gold); font-size: 1rem; font-family: 'Kanit'; font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
-
+  .section-label { color: var(--gold); font-size: 1rem; font-family: 'Kanit'; font-weight: bold; margin-bottom: 1rem; }
   .char-grid, .team-grid { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
   .char-card, .team-card { padding: 10px 18px; background: var(--bg-lighter); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
   .char-card.selected, .team-card.selected { border-color: var(--gold); background: rgba(245, 200, 66, 0.2); font-weight: bold; }
-
+  
+  /* Table Locked Style */
   .table-wrapper { overflow-x: auto; background: var(--bg-lighter); border-radius: 15px; border: 1px solid var(--border); margin-bottom: 2rem; }
   table { width: 100%; border-collapse: collapse; min-width: 1100px; table-layout: fixed; }
   th { background: var(--bg-darker); color: var(--text-dim); font-size: 0.8rem; padding: 15px 5px; font-family: 'Kanit'; border: 1px solid rgba(255,255,255,0.05); }
   td { border: 1px solid rgba(255,255,255,0.05); padding: 10px 5px; text-align: center; vertical-align: middle; word-wrap: break-word; }
-  
   th:first-child, td:first-child { width: 120px; }
   th:not(:first-child), td:not(:first-child) { width: 196px; }
 
   .date-big { font-size: 0.95rem; font-weight: bold; color: var(--gold); }
   .date-sub { font-size: 0.65rem; opacity: 0.7; color: var(--text-dim); }
   .today-row { background: rgba(245, 200, 66, 0.05); }
-
+  
   .slot-container { display: flex; flex-direction: column; align-items: center; gap: 6px; }
   .btn-action-group { display: flex; gap: 4px; width: 90%; }
   .btn-sign { flex: 1; padding: 7px 2px; border: none; border-radius: 6px; font-family: 'Kanit'; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
   .btn-in { background: rgba(66, 245, 164, 0.1); color: var(--green); border: 1px solid rgba(66, 245, 164, 0.3); }
   .btn-in:disabled { opacity: 0.15; cursor: not-allowed; }
   .btn-out { background: rgba(245, 90, 66, 0.1); color: var(--red); border: 1px solid rgba(245, 90, 66, 0.3); }
-  .active-in { background: var(--green) !important; color: #000 !important; border-color: var(--green); }
+  .active-in { background: var(--green) !important; color: #000 !important; }
 
   .player-tag { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-darker); padding: 6px 10px; border-radius: 8px; margin: 4px auto; font-size: 0.75rem; border-left: 3px solid var(--gold); position: relative; width: 95%; max-width: 170px; text-align: left; }
-  .player-name { font-weight: bold; color: #fff; padding-right: 20px; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+  .player-name { font-weight: bold; color: #fff; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+  .btn-admin-del { position: absolute; right: 4px; top: 4px; background: var(--red); color: white; border: none; border-radius: 4px; font-size: 0.6rem; cursor: pointer; padding: 2px 4px; }
   
-  .btn-admin-del { position: absolute; right: 4px; top: 4px; background: var(--red); color: white; border: none; border-radius: 4px; font-size: 0.6rem; cursor: pointer; padding: 2px 4px; z-index: 5; font-weight: bold; }
-
-  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: bold; display: none; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: bold; display: none; z-index: 100; }
   .admin-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 12px; margin-bottom: 8px; border-radius: 12px; border: 1px solid var(--border); }
 </style>
 </head>
 <body>
 
 <div id="loading-page" class="page active" style="align-items: center; justify-content: center;">
-  <div style="font-family:Cinzel; color:var(--gold); font-size:1.5rem; letter-spacing: 2px;">ARENA LOADING...</div>
+  <div style="font-family:Cinzel; color:var(--gold); font-size:1.5rem;">ARENA LOADING...</div>
 </div>
 
 <div id="auth-page" class="page">
@@ -107,11 +109,24 @@
   <nav>
     <div style="color:var(--gold); font-weight:bold; font-family:Cinzel;">⚔️ ARENA PVP</div>
     <div style="font-size:0.85rem;">
-      <span id="n-nick" style="color:var(--gold); font-weight:bold;"></span> (<span id="n-user"></span>) | 
+      <span id="n-nick" style="color:var(--gold); font-weight:bold;"></span> | 
       <a href="javascript:void(0)" onclick="openProfile()" style="color:var(--cyan); text-decoration:none;">ตั้งค่า</a> |
       <a href="javascript:void(0)" onclick="doLogout()" style="color:var(--red); text-decoration:none;">ออก</a>
     </div>
   </nav>
+
+  <div class="info-bar">
+    <div id="announce-box">
+      <span>📢</span>
+      <div id="announce-text">ยินดีต้อนรับสู่ ARENA</div>
+      <button id="adm-ann-btn" style="display:none; background:var(--gold); border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:0.7rem;" onclick="editAnnounce()">แก้ไข</button>
+    </div>
+    <div class="online-status">
+      <div class="online-dot"></div>
+      <span id="online-count">ออนไลน์: 0 คน</span>
+      <span id="online-list" style="color:var(--text-dim); margin-left:5px;"></span>
+    </div>
+  </div>
 
   <div class="nav-tabs">
     <button class="nav-tab active" id="tab-arena-btn" onclick="switchView('arena')">📅 ลงชื่ออารีน่า</button>
@@ -122,17 +137,15 @@
   <div id="view-arena" class="main">
     <div class="section-label"><b>1. เลือกตัวละคร</b></div>
     <div class="char-grid" id="char-list"></div>
-
     <div class="section-label"><b>2. เลือกทีม</b></div>
     <div class="team-grid" id="team-list">
       <div class="team-card" id="team-1" onclick="setTeam('1')">ทีม 1</div>
       <div class="team-card" id="team-2" onclick="setTeam('2')">ทีม 2</div>
       <div class="team-card" id="team-3" onclick="setTeam('3')">ทีม 3</div>
     </div>
-
     <div class="section-label"><b>3. ตารางเวลา / ลงชื่อ</b></div>
     <div class="table-wrapper">
-      <table>
+      <table id="table-arena">
         <thead><tr><th>วัน</th><th>19:00 - 20:00</th><th>20:00 - 21:00</th><th>21:00 - 22:00</th><th>23:00 - 00:00</th><th>00:00 - 01:00</th></tr></thead>
         <tbody id="arena-body"></tbody>
       </table>
@@ -140,12 +153,8 @@
   </div>
 
   <div id="view-list" class="main" style="display:none"><div id="overview-content"></div></div>
-
-  <div id="view-admin" class="main" style="display:none">
-    <div class="section-label">🛡️ จัดการผู้ใช้งาน (Admin)</div>
-    <div id="admin-user-list"></div>
-  </div>
-
+  <div id="view-admin" class="main" style="display:none"><div class="section-label">🛡️ จัดการ User</div><div id="admin-user-list"></div></div>
+  
   <div id="view-profile" class="main" style="display:none">
     <div class="auth-box" style="margin: 0 auto;">
       <div class="section-label">ตั้งค่าบัญชี</div>
@@ -162,175 +171,87 @@
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
 const SUPABASE_URL = "https://vkxncgkipevoblwbqmlp.supabase.co"; 
 const SUPABASE_KEY = "sb_publishable_kZLsrPjyix00ONTZYb7ryA_NmCl8Tq_"; 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const CHARS = [
-  {id:'wolf',emoji:'🐺',n:'หมา'}, {id:'sheep',emoji:'🐑',n:'แกะ'},
-  {id:'rabbit',emoji:'🐰',n:'ต่าย'}, {id:'bat',emoji:'🦇',n:'ค้างคาว'},
-  {id:'penguin',emoji:'🐧',n:'กวิ้น'}, {id:'cat',emoji:'🐱',n:'แมว'}
-];
-
+const CHARS = [{id:'wolf',emoji:'🐺',n:'หมา'},{id:'sheep',emoji:'🐑',n:'แกะ'},{id:'rabbit',emoji:'🐰',n:'ต่าย'},{id:'bat',emoji:'🦇',n:'ค้างคาว'},{id:'penguin',emoji:'🐧',n:'กวิ้น'},{id:'cat',emoji:'🐱',n:'แมว'}];
 const DAYS = [{k:'mon',l:'จันทร์',idx:1},{k:'tue',l:'อังคาร',idx:2},{k:'wed',l:'พุธ',idx:3},{k:'thu',l:'พฤหัส',idx:4},{k:'fri',l:'ศุกร์',idx:5},{k:'sat',l:'เสาร์',idx:6},{k:'sun',l:'อาทิตย์',idx:7}];
 const TIMES_LABELS = ['19:00 - 20:00','20:00 - 21:00','21:00 - 22:00','23:00 - 00:00','00:00 - 01:00'];
 const TIMES_KEYS = ['19-20','20-21','21-22','23-24','00-01'];
 const SLOTS = {tue:{'19-20':'77','21-22':'55','23-24':'77'},wed:{'19-20':'55','23-24':'77'},thu:{'20-21':'77','23-24':'55'},fri:{'00-01':'77'},sat:{'00-01':'77'},sun:{'19-20':'55'}};
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-let user = localStorage.getItem('raidUser');
-let nickname = localStorage.getItem('raidNick') || '';
-let signups = [];
-let selectedChar = null;
-let selectedTeam = null;
+let user = localStorage.getItem('raidUser'), nickname = localStorage.getItem('raidNick') || '';
+let signups = [], selectedChar = null, selectedTeam = null;
 
 window.onload = async () => {
   if(user) {
-    document.getElementById('n-user').textContent = user;
     document.getElementById('n-nick').textContent = nickname;
-    if(user === 'admin') document.getElementById('tab-admin-btn').style.display = 'block';
-    await sync();
-    showPage('app-page');
+    if(user === 'admin') {
+      document.getElementById('adm-ann-btn').style.display = 'block';
+      document.getElementById('tab-admin-btn').style.display = 'block';
+    }
+    await sync(); setupPresence(); showPage('app-page');
   } else { showPage('auth-page'); }
   renderChars();
 };
 
 async function sync() {
-  const { data } = await supabase.from('signups').select('*');
-  signups = data || [];
-  renderSchedule();
-  if(document.getElementById('view-list').style.display !== 'none') renderOverview();
+  try {
+    const { data: s } = await supabase.from('signups').select('*'); signups = s || [];
+    const { data: a } = await supabase.from('announcements').select('content').eq('id', 1).maybeSingle();
+    if(a) document.getElementById('announce-text').textContent = a.content;
+    renderSchedule(); if(document.getElementById('view-list').style.display !== 'none') renderOverview();
+  } catch(e) { console.error(e); }
 }
 
-supabase.channel('any').on('postgres_changes', {event:'*', schema:'public', table:'signups'}, sync).subscribe();
-
-window.switchTab = (t) => {
-  document.getElementById('login-form').style.display = t==='login'?'block':'none';
-  document.getElementById('reg-form').style.display = t==='register'?'block':'none';
-  document.getElementById('tab-login-btn').classList.toggle('active', t==='login');
-  document.getElementById('tab-reg-btn').classList.toggle('active', t==='register');
-};
-
-window.switchView = (v) => {
-  document.querySelectorAll('.main').forEach(m => m.style.display='none');
-  document.getElementById('view-'+v).style.display='block';
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.id==='tab-'+v+'-btn'));
-  if(v==='list') renderOverview();
-  if(v==='admin') loadUsersAdmin();
-};
-
-window.togglePass = (id) => { const i = document.getElementById(id); i.type = i.type==='password'?'text':'password'; };
-
-window.doLogin = async () => {
-  const u = document.getElementById('l-user').value.trim();
-  const p = document.getElementById('l-pass').value;
-  if(u==='admin'&&p==='admingun'){
-    localStorage.setItem('raidUser','admin'); localStorage.setItem('raidNick','Admin Gun');
-    location.reload(); return;
-  }
-  const {data} = await supabase.from('users').select('*').eq('username',u).eq('password',btoa(p)).single();
-  if(data){
-    localStorage.setItem('raidUser',u); localStorage.setItem('raidNick',data.nickname);
-    localStorage.setItem('raidPhone',data.phone); location.reload();
-  } else msg("ไอดีหรือรหัสผ่านไม่ถูกต้อง","red");
-};
-
-window.doRegister = async () => {
-  const u=document.getElementById('r-user').value.trim(), n=document.getElementById('r-nick').value.trim(), p1=document.getElementById('r-pass').value, p2=document.getElementById('r-pass2').value, ph=document.getElementById('r-phone').value.trim();
-  if(!u || !n || !p1) { msg("กรุณากรอกข้อมูลให้ครบ","red"); return; }
-  if(p1!==p2){ msg("รหัสผ่านยืนยันไม่ตรงกัน","red"); return; }
-  const {error} = await supabase.from('users').insert([{username:u,password:btoa(p1),nickname:n,phone:ph}]);
-  if(!error){ alert("สมัครสำเร็จ!"); switchTab('login'); } else msg("Username นี้มีผู้ใช้แล้ว","red");
-};
-
-window.doLogout = () => { localStorage.clear(); location.reload(); };
-
-window.openProfile = () => {
-  document.getElementById('p-nick').value = nickname;
-  document.getElementById('p-phone').value = localStorage.getItem('raidPhone') || '';
-  switchView('profile');
-};
-
-window.updateProfile = async () => {
-  const newNick = document.getElementById('p-nick').value.trim();
-  const newPhone = document.getElementById('p-phone').value.trim();
-  const newPass = document.getElementById('p-pass').value;
-  const upData = { nickname: newNick, phone: newPhone };
-  if(newPass) upData.password = btoa(newPass);
-  const { error } = await supabase.from('users').update(upData).eq('username', user);
-  if(!error) {
-    localStorage.setItem('raidNick', newNick);
-    localStorage.setItem('raidPhone', newPhone);
-    alert("อัปเดตข้อมูลแล้ว!"); location.reload();
-  }
-};
-
-async function loadUsersAdmin() {
-  const container = document.getElementById('admin-user-list');
-  container.innerHTML = 'กำลังดึงข้อมูล...';
-  const { data, error } = await supabase.from('users').select('*');
-  if(error) { container.innerHTML = 'Error โหลดรายชื่อ'; return; }
-  let h = '';
-  data.forEach(u => {
-    if(u.username === 'admin') return;
-    h += `<div class="admin-item">
-      <span><strong>${u.username}</strong><br><small>${u.nickname}</small><br><small>📞 ${u.phone}</small></span>
-      <div>
-        <button onclick="editUserAdmin('${u.username}','${u.nickname}','${u.phone}')" style="background:var(--cyan); border:none; padding:5px; border-radius:5px; cursor:pointer;">แก้</button>
-        <button onclick="delUserAdmin('${u.username}')" style="background:var(--red); border:none; padding:5px; border-radius:5px; cursor:pointer; margin-left:5px; color:white;">ลบ</button>
-      </div>
-    </div>`;
+function setupPresence() {
+  const channel = supabase.channel('arena_presence', { config: { presence: { key: nickname || user } } });
+  channel.on('presence', { event: 'sync' }, () => {
+    const state = channel.presenceState();
+    const users = Object.keys(state);
+    document.getElementById('online-count').textContent = `ออนไลน์: ${users.length} คน`;
+    document.getElementById('online-list').textContent = `(${users.join(', ')})`;
+  }).subscribe(async (status) => {
+    if (status === 'SUBSCRIBED') await channel.track({ online_at: new Date().toISOString() });
   });
-  container.innerHTML = h;
 }
-window.editUserAdmin = async (target, currNick, currPhone) => {
-  const n = prompt("ชื่อเล่นใหม่:", currNick);
-  const ph = prompt("เบอร์โทรใหม่:", currPhone);
-  const p = prompt("รหัสผ่านใหม่ (ว่างไว้ถ้าไม่เปลี่ยน):");
-  if(n === null) return;
-  const up = { nickname: n, phone: ph }; if(p) up.password = btoa(p);
-  await supabase.from('users').update(up).eq('username', target);
-  loadUsersAdmin();
-};
-window.delUserAdmin = async (target) => { if(confirm("ลบ User นี้?")) { await supabase.from('users').delete().eq('username', target); loadUsersAdmin(); } };
 
-window.adminKick = async (signupId) => {
-  if(!confirm("🛡️ ยืนยันการลบรายชื่อนี้ออกจากตาราง?")) return;
-  const { error } = await supabase.from('signups').delete().eq('id', signupId);
-  if(error) { showToast("❌ ลบไม่ได้: " + error.message); } 
-  else { showToast("🛡️ ลบเรียบร้อย!"); await sync(); }
+window.editAnnounce = async () => {
+  const current = document.getElementById('announce-text').textContent, next = prompt("ข้อความประกาศใหม่:", current);
+  if(next !== null) { await supabase.from('announcements').update({ content: next }).eq('id', 1); sync(); }
 };
 
+// Utils & Auth
+window.switchTab = (t) => { document.getElementById('login-form').style.display = t==='login'?'block':'none'; document.getElementById('reg-form').style.display = t==='register'?'block':'none'; };
+window.switchView = (v) => { document.querySelectorAll('.main').forEach(m => m.style.display='none'); document.getElementById('view-'+v).style.display='block'; document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.id==='tab-'+v+'-btn')); if(v==='list') renderOverview(); if(v==='admin') loadUsersAdmin(); };
+window.togglePass = (id) => { const i = document.getElementById(id); i.type = i.type==='password'?'text':'password'; };
+window.doLogin = async () => { const u = document.getElementById('l-user').value.trim(), p = document.getElementById('l-pass').value; if(u==='admin'&&p==='admingun'){ localStorage.setItem('raidUser','admin'); localStorage.setItem('raidNick','Admin'); location.reload(); return; } const {data} = await supabase.from('users').select('*').eq('username',u).eq('password',btoa(p)).single(); if(data){ localStorage.setItem('raidUser',u); localStorage.setItem('raidNick',data.nickname); localStorage.setItem('raidPhone',data.phone); location.reload(); } else msg("ไอดีหรือรหัสผ่านผิด","red"); };
+window.doRegister = async () => { const u=document.getElementById('r-user').value.trim(), n=document.getElementById('r-nick').value.trim(), p1=document.getElementById('r-pass').value, p2=document.getElementById('r-pass2').value, ph=document.getElementById('r-phone').value.trim(); if(p1!==p2) return msg("รหัสผ่านไม่ตรงกัน","red"); const {error} = await supabase.from('users').insert([{username:u,password:btoa(p1),nickname:n,phone:ph}]); if(!error) alert("สมัครสำเร็จ!"), switchTab('login'); else msg("ชื่อผู้ใช้นี้มีคนใช้แล้ว","red"); };
+window.doLogout = () => { localStorage.clear(); location.reload(); };
+window.openProfile = () => { document.getElementById('p-nick').value = nickname; document.getElementById('p-phone').value = localStorage.getItem('raidPhone'); switchView('profile'); };
+window.updateProfile = async () => { const n=document.getElementById('p-nick').value.trim(), ph=document.getElementById('p-phone').value.trim(), p=document.getElementById('p-pass').value; const up = { nickname: n, phone: ph }; if(p) up.password = btoa(p); await supabase.from('users').update(up).eq('username', user); localStorage.setItem('raidNick', n); localStorage.setItem('raidPhone', ph); alert("อัปเดตแล้ว!"); location.reload(); };
+async function loadUsersAdmin() { const {data} = await supabase.from('users').select('*'); let h = ''; data.forEach(u => { if(u.username === 'admin') return; h += `<div class="admin-item"><span><strong>${u.username}</strong> (${u.nickname})</span><div><button onclick="editUserAdmin('${u.username}','${u.nickname}','${u.phone}')" style="background:var(--cyan); border:none; padding:5px; border-radius:5px; cursor:pointer;">แก้</button><button onclick="delUserAdmin('${u.username}')" style="background:var(--red); border:none; padding:5px; border-radius:5px; cursor:pointer; margin-left:5px; color:white;">ลบ</button></div></div>`; }); document.getElementById('admin-user-list').innerHTML = h; }
+window.editUserAdmin = async (t,n,ph) => { const nn=prompt("ชื่อเล่น:",n), pp=prompt("เบอร์:",ph), pw=prompt("รหัสใหม่:", ""); const up={nickname:nn,phone:pp}; if(pw) up.password=btoa(pw); await supabase.from('users').update(up).eq('username',t); loadUsersAdmin(); };
+window.delUserAdmin = async (t) => { if(confirm("ลบผู้ใช้?")) await supabase.from('users').delete().eq('username',t), loadUsersAdmin(); };
+window.adminKick = async (id) => { if(confirm("ลบรายชื่อนี้?")) await supabase.from('signups').delete().eq('id', id), sync(); };
+
+// Arena Logic
 window.setChar = (id) => { selectedChar = id; renderChars(); };
 window.setTeam = (id) => { selectedTeam = id; document.querySelectorAll('.team-card').forEach(c => c.classList.toggle('selected', c.id==='team-'+id)); };
-
-function getDates() {
-  const now = new Date();
-  let curIdx = now.getDay() === 0 ? 7 : now.getDay();
-  return DAYS.map(d => {
-    const date = new Date();
-    date.setDate(now.getDate() + (d.idx - curIdx));
-    const ds = `${date.getDate()} / ${MONTHS[date.getMonth()]} / ${date.getFullYear()}`;
-    return { ...d, dateStr: ds, isToday: d.idx === curIdx };
-  });
-}
+function renderChars() { document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join(''); }
+function getDates() { const now = new Date(); let curIdx = now.getDay() === 0 ? 7 : now.getDay(); return DAYS.map(d => { const date = new Date(); date.setDate(now.getDate() + (d.idx - curIdx)); return { ...d, dateStr: `${date.getDate()} / ${MONTHS[date.getMonth()]} / ${date.getFullYear()}`, isToday: d.idx === curIdx }; }); }
 
 function renderSchedule() {
-  const dates = getDates();
-  let h = '';
+  const dates = getDates(); let h = '';
   dates.forEach(day => {
     h += `<tr class="${day.isToday?'today-row':''}"><td><span class="date-big">${day.l}</span><br><span class="date-sub">${day.dateStr}</span></td>`;
     TIMES_KEYS.forEach(t => {
       const type = (SLOTS[day.k] && SLOTS[day.k][t]) || null;
       if(!type) { h += '<td>-</td>'; return; }
-      const key = `${day.k}_${t}`;
-      const ps = signups.filter(s => s.slot_key === key);
-      const isMe = ps.some(s => s.username === user);
-      const max = type==='77'?7:5;
-      h += `<td><div class="slot-container"><div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${ps.length}/${max})</div>
-      <div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=max?'disabled':''}>ลงชื่อเข้า</button>
-      <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ลงชื่อออก</button></div></div></td>`;
+      const key = `${day.k}_${t}`, ps = signups.filter(s => s.slot_key === key), isMe = ps.some(s => s.username === user);
+      h += `<td><div class="slot-container"><div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${ps.length}/${type==='77'?7:5})</div><div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=(type==='77'?7:5)?'disabled':''}>ลงชื่อเข้า</button><button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ออก</button></div></div></td>`;
     });
     h += '</tr>';
   });
@@ -338,8 +259,7 @@ function renderSchedule() {
 }
 
 function renderOverview() {
-  const dates = getDates();
-  let html = '';
+  const dates = getDates(); let html = '';
   [1, 2, 3].forEach(num => {
     html += `<div class="section-label">ทีม ${num}</div><div class="table-wrapper"><table><thead><tr><th>วัน</th>`;
     TIMES_LABELS.forEach(t => html += `<th>${t}</th>`);
@@ -347,9 +267,8 @@ function renderOverview() {
     dates.forEach(day => {
       html += `<tr class="${day.isToday?'today-row':''}"><td><span style="font-weight:bold; color:var(--gold); font-size:0.9rem;">${day.l}</span><br><span style="font-size:0.65rem; opacity:0.7;">${day.dateStr}</span></td>`;
       TIMES_KEYS.forEach(t => {
-        const key = `${day.k}_${t}`;
-        const ps = signups.filter(s => s.slot_key === key && String(s.team) === String(num));
-        let list = ps.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span><span style="font-size:0.65rem; color:var(--cyan)">📞 ${p.phone || '-'}</span>${user==='admin'?`<button class="btn-admin-del" onclick="adminKick(${p.id})">ลบ</button>`:''}</div>`).join('');
+        const key = `${day.k}_${t}`, ps = signups.filter(s => s.slot_key === key && String(s.team) === String(num));
+        let list = ps.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span><span style="font-size:0.65rem; color:var(--cyan)">📞 ${p.phone || '-'}</span>${user==='admin'?`<button class="btn-admin-del" onclick="adminKick('${p.id}')">ลบ</button>`:''}</div>`).join('');
         html += `<td>${list || '-'}</td>`;
       });
       html += `</tr>`;
@@ -360,21 +279,17 @@ function renderOverview() {
 }
 
 window.handleJoin = async (key) => {
-  if(!selectedChar || !selectedTeam) { showToast("⚠️ เลือกตัวละครและทีมก่อน!"); return; }
-  if(signups.some(s => s.slot_key === key && s.username === user)) { showToast("⚠️ ลงรอบนี้ไปแล้ว!"); return; }
-  const { error } = await supabase.from('signups').insert([{ slot_key: key, username: user, nickname: nickname, char_id: selectedChar, char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, team: selectedTeam, phone: localStorage.getItem('raidPhone') || '', week_key: new Date().toISOString().split('T')[0] }]);
-  if(!error) { showToast("✅ ลงชื่อสำเร็จ!"); sync(); }
+  if(!selectedChar || !selectedTeam) return showToast("⚠️ เลือกตัวละครและทีมก่อน!");
+  if(signups.some(s => s.slot_key === key && s.username === user)) return;
+  await supabase.from('signups').insert([{ slot_key: key, username: user, nickname: nickname, char_id: selectedChar, char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, team: selectedTeam, phone: localStorage.getItem('raidPhone') || '', week_key: new Date().toISOString().split('T')[0] }]);
+  sync();
 };
-
-window.handleLeave = async (key) => {
-  const has = signups.find(s => s.slot_key === key && s.username === user);
-  if(has) { await supabase.from('signups').delete().eq('id', has.id); showToast("🔔 ออกแล้ว"); sync(); }
-};
-
+window.handleLeave = async (key) => { const has = signups.find(s => s.slot_key === key && s.username === user); if(has) await supabase.from('signups').delete().eq('id', has.id), sync(); };
 function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function msg(t,c) { const e=document.getElementById('auth-msg'); e.textContent=t; e.style.color=c; }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
-function renderChars() { document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join(''); }
+
+supabase.channel('arena_main').on('postgres_changes', {event:'*', schema:'public', table:'signups'}, sync).on('postgres_changes', {event:'*', schema:'public', table:'announcements'}, sync).subscribe();
 </script>
 </body>
 </html>
