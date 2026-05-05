@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.06.5</title>
+<title>12Tails Arena PVP - Rev.06.6</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
   :root {
     --bg: #12141d; --bg-darker: #0b0d13; --bg-lighter: #1c1f2b; --surface: #1e2230;
-    --border: rgba(255, 180, 50, 0.15); --text: #e2e2e2; --text-dim: #9499b0;
+    --border: rgba(255, 180, 50, 0.2); --text: #e2e2e2; --text-dim: #9499b0;
     --gold: #f5c842; --accent: #e8a020; --cyan: #42d4f5; --red: #f55a42; --green: #42f5a4;
   }
 
@@ -31,14 +31,26 @@
   .online-status { font-size: 0.75rem; color: var(--green); display: flex; align-items: center; gap: 6px; padding-left: 5px; }
   .online-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; box-shadow: 0 0 8px var(--green); }
 
-  /* Auth UI */
+  /* Auth UI - ปรับปรุงปุ่มเหลืองทอง */
   #auth-page { align-items: center; justify-content: center; padding: 20px; background: radial-gradient(circle at center, #1c1f2b 0%, #12141d 100%); }
-  .auth-box { width: 100%; max-width: 400px; padding: 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; }
-  .logo { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 900; text-align: center; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .input-group { position: relative; margin-bottom: 1rem; }
-  input { width: 100%; background: var(--bg-darker); border: 1px solid var(--border); color: #fff; padding: 0.9rem; border-radius: 10px; outline: none; }
-  .toggle-pass { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.5; }
-  .btn-primary { width: 100%; padding: 0.9rem; border: none; border-radius: 10px; background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
+  .auth-box { width: 100%; max-width: 400px; padding: 2.5rem 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+  .logo { font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 2rem; background: linear-gradient(135deg, #fff, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+  
+  .tab-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+  .tab-btn { flex: 1; padding: 0.6rem; border: 1px solid var(--border); background: rgba(255,255,255,0.02); color: var(--text-dim); cursor: pointer; border-radius: 8px; font-family: 'Kanit'; transition: 0.3s; font-size: 0.9rem; }
+  .tab-btn:hover { border-color: var(--gold); color: var(--text); }
+  .tab-btn.active { border-color: var(--gold); background: rgba(245, 200, 66, 0.1); color: var(--gold); font-weight: bold; box-shadow: inset 0 0 10px rgba(245, 200, 66, 0.1); }
+
+  .input-group { position: relative; margin-bottom: 1.2rem; }
+  input { width: 100%; background: var(--bg-darker); border: 1px solid var(--border); color: #fff; padding: 1rem; border-radius: 12px; outline: none; transition: 0.3s; font-family: 'Sarabun'; }
+  input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(245, 200, 66, 0.1); }
+  
+  .toggle-pass { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.5; transition: 0.3s; }
+  .toggle-pass:hover { opacity: 1; }
+
+  .btn-primary { width: 100%; padding: 1rem; border: none; border-radius: 12px; background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 0.5rem; font-family: 'Kanit'; font-size: 1rem; box-shadow: 0 4px 15px rgba(245, 200, 66, 0.2); }
+  .btn-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 200, 66, 0.3); }
+  .btn-primary:active { transform: translateY(0); }
   
   /* Arena UI */
   .main { padding: 1.5rem; max-width: 1300px; margin: 0 auto; width: 100%; }
@@ -47,7 +59,6 @@
   .char-card, .team-card { padding: 10px 18px; background: var(--bg-lighter); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
   .char-card.selected, .team-card.selected { border-color: var(--gold); background: rgba(245, 200, 66, 0.2); font-weight: bold; }
   
-  /* Table Locked Style */
   .table-wrapper { overflow-x: auto; background: var(--bg-lighter); border-radius: 15px; border: 1px solid var(--border); margin-bottom: 2rem; }
   table { width: 100%; border-collapse: collapse; min-width: 1100px; table-layout: fixed; }
   th { background: var(--bg-darker); color: var(--text-dim); font-size: 0.8rem; padding: 15px 5px; font-family: 'Kanit'; border: 1px solid rgba(255,255,255,0.05); }
@@ -78,7 +89,7 @@
 <body>
 
 <div id="loading-page" class="page active" style="align-items: center; justify-content: center;">
-  <div style="font-family:Cinzel; color:var(--gold); font-size:1.5rem;">ARENA LOADING...</div>
+  <div style="font-family:Cinzel; color:var(--gold); font-size:1.5rem; letter-spacing: 2px;">ARENA LOADING...</div>
 </div>
 
 <div id="auth-page" class="page">
@@ -88,20 +99,22 @@
       <button class="tab-btn active" id="tab-login-btn" onclick="switchTab('login')">เข้าสู่ระบบ</button>
       <button class="tab-btn" id="tab-reg-btn" onclick="switchTab('register')">สมัครสมาชิก</button>
     </div>
+    
     <div id="login-form">
-      <div class="input-group"><input type="text" id="l-user" placeholder="USERNAME"></div>
-      <div class="input-group"><input type="password" id="l-pass" placeholder="PASSWORD"><span class="toggle-pass" onclick="togglePass('l-pass')">👁️</span></div>
+      <div class="input-group"><input type="text" id="l-user" placeholder="USERNAME" onkeyup="checkEnter(event, 'login')"></div>
+      <div class="input-group"><input type="password" id="l-pass" placeholder="PASSWORD" onkeyup="checkEnter(event, 'login')"><span class="toggle-pass" onclick="togglePass('l-pass')">👁️</span></div>
       <button class="btn-primary" onclick="doLogin()">⚔️ เข้าสู่ ARENA</button>
     </div>
+
     <div id="reg-form" style="display:none">
-      <div class="input-group"><input type="text" id="r-user" placeholder="USERNAME"></div>
-      <div class="input-group"><input type="text" id="r-nick" placeholder="ชื่อเล่น (NICKNAME)"></div>
-      <div class="input-group"><input type="password" id="r-pass" placeholder="PASSWORD"><span class="toggle-pass" onclick="togglePass('r-pass')">👁️</span></div>
-      <div class="input-group"><input type="password" id="r-pass2" placeholder="ยืนยัน PASSWORD"><span class="toggle-pass" onclick="togglePass('r-pass2')">👁️</span></div>
-      <div class="input-group"><input type="tel" id="r-phone" placeholder="เบอร์โทรศัพท์ (0XXXXXXXXX)"></div>
-      <button class="btn-primary" onclick="doRegister()">สร้างบัญชี</button>
+      <div class="input-group"><input type="text" id="r-user" placeholder="USERNAME" onkeyup="checkEnter(event, 'register')"></div>
+      <div class="input-group"><input type="text" id="r-nick" placeholder="ชื่อเล่น (NICKNAME)" onkeyup="checkEnter(event, 'register')"></div>
+      <div class="input-group"><input type="password" id="r-pass" placeholder="PASSWORD" onkeyup="checkEnter(event, 'register')"><span class="toggle-pass" onclick="togglePass('r-pass')">👁️</span></div>
+      <div class="input-group"><input type="password" id="r-pass2" placeholder="ยืนยัน PASSWORD" onkeyup="checkEnter(event, 'register')"><span class="toggle-pass" onclick="togglePass('r-pass2')">👁️</span></div>
+      <div class="input-group"><input type="tel" id="r-phone" placeholder="เบอร์โทรศัพท์ (0XXXXXXXXX)" onkeyup="checkEnter(event, 'register')"></div>
+      <button class="btn-primary" onclick="doRegister()">สร้างบัญชีใหม่</button>
     </div>
-    <div id="auth-msg" style="text-align:center; margin-top:1rem; font-size:0.8rem;"></div>
+    <div id="auth-msg" style="text-align:center; margin-top:1.5rem; font-size:0.85rem; font-family: 'Kanit'; min-height: 20px;"></div>
   </div>
 </div>
 
@@ -197,6 +210,14 @@ window.onload = async () => {
   renderChars();
 };
 
+// เพิ่มฟังก์ชันตรวจสอบปุ่ม Enter[cite: 1]
+window.checkEnter = (e, type) => {
+  if (e.key === 'Enter') {
+    if (type === 'login') doLogin();
+    else if (type === 'register') doRegister();
+  }
+};
+
 async function sync() {
   try {
     const { data: s } = await supabase.from('signups').select('*'); signups = s || [];
@@ -223,8 +244,13 @@ window.editAnnounce = async () => {
   if(next !== null) { await supabase.from('announcements').update({ content: next }).eq('id', 1); sync(); }
 };
 
-// Utils & Auth
-window.switchTab = (t) => { document.getElementById('login-form').style.display = t==='login'?'block':'none'; document.getElementById('reg-form').style.display = t==='register'?'block':'none'; };
+// Utils & Auth[cite: 1]
+window.switchTab = (t) => { 
+  document.getElementById('login-form').style.display = t==='login'?'block':'none'; 
+  document.getElementById('reg-form').style.display = t==='register'?'block':'none'; 
+  document.getElementById('tab-login-btn').classList.toggle('active', t==='login');
+  document.getElementById('tab-reg-btn').classList.toggle('active', t==='register');
+};
 window.switchView = (v) => { document.querySelectorAll('.main').forEach(m => m.style.display='none'); document.getElementById('view-'+v).style.display='block'; document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.id==='tab-'+v+'-btn')); if(v==='list') renderOverview(); if(v==='admin') loadUsersAdmin(); };
 window.togglePass = (id) => { const i = document.getElementById(id); i.type = i.type==='password'?'text':'password'; };
 window.doLogin = async () => { const u = document.getElementById('l-user').value.trim(), p = document.getElementById('l-pass').value; if(u==='admin'&&p==='admingun'){ localStorage.setItem('raidUser','admin'); localStorage.setItem('raidNick','Admin'); location.reload(); return; } const {data} = await supabase.from('users').select('*').eq('username',u).eq('password',btoa(p)).single(); if(data){ localStorage.setItem('raidUser',u); localStorage.setItem('raidNick',data.nickname); localStorage.setItem('raidPhone',data.phone); location.reload(); } else msg("ไอดีหรือรหัสผ่านผิด","red"); };
@@ -237,7 +263,7 @@ window.editUserAdmin = async (t,n,ph) => { const nn=prompt("ชื่อเล�
 window.delUserAdmin = async (t) => { if(confirm("ลบผู้ใช้?")) await supabase.from('users').delete().eq('username',t), loadUsersAdmin(); };
 window.adminKick = async (id) => { if(confirm("ลบรายชื่อนี้?")) await supabase.from('signups').delete().eq('id', id), sync(); };
 
-// Arena Logic
+// Arena Logic[cite: 1]
 window.setChar = (id) => { selectedChar = id; renderChars(); };
 window.setTeam = (id) => { selectedTeam = id; document.querySelectorAll('.team-card').forEach(c => c.classList.toggle('selected', c.id==='team-'+id)); };
 function renderChars() { document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join(''); }
