@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.04.6</title>
+<title>12Tails Arena PVP - Rev.05</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -41,72 +41,76 @@
   .tab-btn { flex: 1; padding: 0.7rem; border: none; background: transparent; color: var(--text-dim); cursor: pointer; border-radius: 8px; font-family: 'Kanit'; }
   .tab-btn.active { background: var(--accent); color: #000; font-weight: bold; }
 
-  input { width: 100%; background: var(--bg-darker); border: 1px solid var(--border); color: #fff; padding: 0.9rem; border-radius: 10px; margin-bottom: 1rem; outline: none; }
+  .input-group { position: relative; margin-bottom: 1rem; }
+  input { width: 100%; background: var(--bg-darker); border: 1px solid var(--border); color: #fff; padding: 0.9rem; border-radius: 10px; outline: none; }
+  .toggle-pass { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 1.2rem; opacity: 0.5; }
+
   .btn-primary { width: 100%; padding: 0.9rem; border: none; border-radius: 10px; background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; }
 
-  .main { padding: 1.5rem; max-width: 1100px; margin: 0 auto; width: 100%; }
-  .section-label { color: var(--gold); font-size: 0.9rem; font-family: 'Kanit'; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+  .main { padding: 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+  .section-label { color: var(--gold); font-size: 1rem; font-family: 'Kanit'; font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
 
-  .char-grid { display: flex; gap: 10px; margin-bottom: 2rem; flex-wrap: wrap; }
-  .char-card { padding: 10px 18px; background: var(--bg-lighter); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
-  .char-card.selected { border-color: var(--gold); background: rgba(245, 200, 66, 0.2); box-shadow: 0 0 15px rgba(245, 200, 66, 0.1); }
+  .char-grid, .team-grid { display: flex; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .char-card, .team-card { padding: 10px 18px; background: var(--bg-lighter); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+  .char-card.selected, .team-card.selected { border-color: var(--gold); background: rgba(245, 200, 66, 0.2); font-weight: bold; }
 
-  .table-wrapper { overflow-x: auto; background: var(--bg-lighter); border-radius: 15px; border: 1px solid var(--border); }
+  .table-wrapper { overflow-x: auto; background: var(--bg-lighter); border-radius: 15px; border: 1px solid var(--border); margin-bottom: 2rem; }
   table { width: 100%; border-collapse: collapse; min-width: 950px; }
-  th { background: var(--bg-darker); color: var(--text-dim); font-size: 0.75rem; padding: 15px 10px; font-family: 'Kanit'; }
+  th { background: var(--bg-darker); color: var(--text-dim); font-size: 0.8rem; padding: 15px 10px; font-family: 'Kanit'; }
   td { border: 1px solid rgba(255,255,255,0.03); padding: 12px; text-align: center; vertical-align: middle; }
 
-  .today-row { background: rgba(245, 200, 66, 0.03); }
-  .today-label { color: var(--gold) !important; font-weight: bold; }
+  .date-big { font-size: 0.9rem; font-weight: bold; color: var(--text); }
+  .today-row { background: rgba(245, 200, 66, 0.05); }
 
   .slot-container { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .slot-info { font-size: 0.85rem; font-weight: bold; font-family: 'Kanit'; }
-  .slot-count { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 4px; }
-  
   .btn-action-group { display: flex; gap: 4px; width: 100%; }
-  .btn-sign { flex: 1; padding: 6px 2px; border: none; border-radius: 4px; font-family: 'Kanit'; font-size: 0.7rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
-  
+  .btn-sign { flex: 1; padding: 6px 2px; border: none; border-radius: 4px; font-family: 'Kanit'; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
   .btn-in { background: rgba(66, 245, 164, 0.1); color: var(--green); border: 1px solid rgba(66, 245, 164, 0.3); }
-  .btn-in:hover:not(:disabled) { background: var(--green); color: #000; }
-  .btn-in:disabled { opacity: 0.3; cursor: not-allowed; }
-
   .btn-out { background: rgba(245, 90, 66, 0.1); color: var(--red); border: 1px solid rgba(245, 90, 66, 0.3); }
-  .btn-out:hover:not(:disabled) { background: var(--red); color: #fff; }
-  .btn-out:disabled { opacity: 0.1; cursor: not-allowed; border-color: transparent; }
-
   .active-in { background: var(--green) !important; color: #000 !important; }
 
-  .player-tag { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-darker); padding: 6px 10px; border-radius: 8px; margin-bottom: 5px; font-size: 0.75rem; border-left: 3px solid var(--gold); border: 1px solid var(--border); }
-  .player-name { font-weight: bold; color: #fff; margin-bottom: 2px; }
-  .player-info { color: var(--cyan); font-size: 0.65rem; }
+  .player-tag { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-darker); padding: 6px 10px; border-radius: 8px; margin-bottom: 5px; font-size: 0.75rem; border-left: 3px solid var(--gold); }
+  .player-name { font-weight: bold; color: #fff; }
 
-  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: bold; display: none; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: 'Kanit'; }
-  .spinner { width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .admin-panel { background: #2a1a1a; padding: 1rem; border-radius: 10px; border: 1px solid var(--red); margin-top: 1rem; }
+  .user-list-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: bold; display: none; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 </style>
 </head>
 <body>
 
 <div id="loading-page" class="page active" style="align-items: center; justify-content: center;">
-  <div class="spinner"></div>
+  <div style="font-family:Cinzel; color:var(--gold); font-size:1.5rem;">LOADING ARENA...</div>
 </div>
 
 <div id="auth-page" class="page">
   <div class="auth-box">
     <div class="logo">12TAILS</div>
     <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('login')">เข้าสู่ระบบ</button>
-      <button class="tab-btn" onclick="switchTab('register')">สมัครสมาชิก</button>
+      <button class="tab-btn active" id="tab-login-btn" onclick="switchTab('login')">เข้าสู่ระบบ</button>
+      <button class="tab-btn" id="tab-reg-btn" onclick="switchTab('register')">สมัครสมาชิก</button>
     </div>
     <div id="login-form">
-      <input type="text" id="l-user" placeholder="USERNAME">
-      <input type="password" id="l-pass" placeholder="PASSWORD">
+      <div class="input-group"><input type="text" id="l-user" placeholder="USERNAME"></div>
+      <div class="input-group">
+        <input type="password" id="l-pass" placeholder="PASSWORD">
+        <span class="toggle-pass" onclick="togglePass('l-pass')">👁️</span>
+      </div>
       <button class="btn-primary" onclick="doLogin()">⚔️ เข้าสู่ ARENA</button>
     </div>
     <div id="reg-form" style="display:none">
-      <input type="text" id="r-user" placeholder="USERNAME">
-      <input type="password" id="r-pass" placeholder="PASSWORD">
-      <input type="tel" id="r-phone" placeholder="เบอร์โทรศัพท์ (0XXXXXXXXX)">
+      <div class="input-group"><input type="text" id="r-user" placeholder="USERNAME"></div>
+      <div class="input-group"><input type="text" id="r-nick" placeholder="ชื่อเล่น (NICKNAME)"></div>
+      <div class="input-group">
+        <input type="password" id="r-pass" placeholder="PASSWORD">
+        <span class="toggle-pass" onclick="togglePass('r-pass')">👁️</span>
+      </div>
+      <div class="input-group">
+        <input type="password" id="r-pass2" placeholder="ยืนยัน PASSWORD">
+        <span class="toggle-pass" onclick="togglePass('r-pass2')">👁️</span>
+      </div>
+      <div class="input-group"><input type="tel" id="r-phone" placeholder="เบอร์โทรศัพท์ (0XXXXXXXXX)"></div>
       <button class="btn-primary" onclick="doRegister()">สร้างบัญชี</button>
     </div>
     <div id="auth-msg" style="text-align:center; margin-top:1rem; font-size:0.8rem;"></div>
@@ -115,55 +119,61 @@
 
 <div id="app-page" class="page">
   <nav>
-    <div style="color:var(--gold); font-weight:bold; font-family:Cinzel; letter-spacing:1px;">⚔️ ARENA PVP</div>
+    <div style="color:var(--gold); font-weight:bold; font-family:Cinzel;">⚔️ ARENA PVP</div>
     <div style="font-size:0.85rem;">
-      <span id="n-user" style="color:#fff; font-weight:bold;"></span> | 
-      <a href="#" onclick="doLogout()" style="color:var(--red); text-decoration:none;">ออกจากระบบ</a>
+      <span id="n-nick" style="color:var(--gold); font-weight:bold;"></span> (<span id="n-user"></span>) | 
+      <a href="#" onclick="openProfile()" style="color:var(--cyan); text-decoration:none;">ตั้งค่า</a> |
+      <a href="#" onclick="doLogout()" style="color:var(--red); text-decoration:none;">ออก</a>
     </div>
   </nav>
 
   <div class="nav-tabs">
-    <button class="nav-tab active" id="tab-join" onclick="switchView('join')">📅 ลงชื่อรับนัด</button>
-    <button class="nav-tab" id="tab-list" onclick="switchView('list')">👥 ตารางรวม</button>
+    <button class="nav-tab active" id="tab-arena-btn" onclick="switchView('arena')">📅 ลงชื่ออารีน่า</button>
+    <button class="nav-tab" id="tab-list-btn" onclick="switchView('list')">👥 ตารางรวม</button>
+    <button class="nav-tab" id="tab-admin-btn" style="display:none; color:var(--red);" onclick="switchView('admin')">🛡️ ADMIN</button>
   </div>
 
-  <div id="view-join" class="main">
+  <div id="view-arena" class="main">
     <div class="section-label">1. เลือกตัวละคร</div>
     <div class="char-grid" id="char-list"></div>
-    <div class="section-label">2. ตารางเวลาลงชื่อ</div>
+
+    <div class="section-label">3. เลือกทีม</div>
+    <div class="team-grid" id="team-list">
+      <div class="team-card" id="team-1" onclick="setTeam('1')">ทีม 1</div>
+      <div class="team-card" id="team-2" onclick="setTeam('2')">ทีม 2</div>
+      <div class="team-card" id="team-3" onclick="setTeam('3')">ทีม 3</div>
+    </div>
+    
+    <div class="section-label">2. ตารางเวลา / ลงชื่อ</div>
     <div class="table-wrapper">
       <table>
         <thead>
-          <tr>
-            <th>วัน</th>
-            <th>19:00 - 20:00</th>
-            <th>20:00 - 21:00</th>
-            <th>21:00 - 22:00</th>
-            <th>23:00 - 00:00</th>
-            <th>00:00 - 01:00</th>
-          </tr>
+          <tr><th>วัน</th><th>19:00 - 20:00</th><th>20:00 - 21:00</th><th>21:00 - 22:00</th><th>23:00 - 00:00</th><th>00:00 - 01:00</th></tr>
         </thead>
-        <tbody id="join-body"></tbody>
+        <tbody id="arena-body"></tbody>
       </table>
     </div>
   </div>
 
   <div id="view-list" class="main" style="display:none">
-    <div class="section-label">📊 สรุปรายชื่อผู้เล่น (Real-time)</div>
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>วัน</th>
-            <th>19:00</th>
-            <th>20:00</th>
-            <th>21:00</th>
-            <th>23:00</th>
-            <th>00:00</th>
-          </tr>
-        </thead>
-        <tbody id="list-body"></tbody>
-      </table>
+    <div id="overview-content"></div>
+  </div>
+
+  <div id="view-admin" class="main" style="display:none">
+    <div class="section-label">🛡️ จัดการผู้ใช้งาน</div>
+    <div class="admin-panel" id="admin-user-list"></div>
+  </div>
+
+  <div id="view-profile" class="main" style="display:none">
+    <div class="auth-box" style="margin: 0 auto;">
+      <div class="section-label">ตั้งค่าบัญชี</div>
+      <input type="text" id="p-nick" placeholder="เปลี่ยนชื่อเล่น">
+      <div class="input-group">
+        <input type="password" id="p-pass" placeholder="รหัสผ่านใหม่">
+        <span class="toggle-pass" onclick="togglePass('p-pass')">👁️</span>
+      </div>
+      <button class="btn-primary" onclick="updateProfile()">บันทึกการแก้ไข</button>
+      <button class="btn-primary" style="background:var(--bg-lighter); color:white; margin-top:10px;" onclick="switchView('arena')">กลับ</button>
     </div>
   </div>
 </div>
@@ -177,186 +187,216 @@ const SUPABASE_URL = "https://vkxncgkipevoblwbqmlp.supabase.co";
 const SUPABASE_KEY = "sb_publishable_kZLsrPjyix00ONTZYb7ryA_NmCl8Tq_"; 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const CHARS = [
-  {id:'wolf',emoji:'🐺',n:'หมา'}, {id:'sheep',emoji:'🐑',n:'แกะ'},
-  {id:'rabbit',emoji:'🐰',n:'ต่าย'}, {id:'bat',emoji:'🦇',n:'ค้างคาว'},
-  {id:'penguin',emoji:'🐧',n:'กวิ้น'}
-];
-
-const DAYS = [
-  {k:'mon',l:'จันทร์',idx:1}, {k:'tue',l:'อังคาร',idx:2}, {k:'wed',l:'พุธ',idx:3},
-  {k:'thu',l:'พฤหัส',idx:4}, {k:'fri',l:'ศุกร์',idx:5}, {k:'sat',l:'เสาร์',idx:6}, 
-  {k:'sun',l:'อาทิตย์',idx:7} 
-];
-
-const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const CHARS = [{id:'wolf',emoji:'🐺',n:'หมา'},{id:'sheep',emoji:'🐑',n:'แกะ'},{id:'rabbit',emoji:'🐰',n:'ต่าย'},{id:'bat',emoji:'🦇',n:'ค้างคาว'},{id:'penguin',emoji:'🐧',n:'กวิ้น'}];
+const DAYS = [{k:'mon',l:'จันทร์',idx:1},{k:'tue',l:'อังคาร',idx:2},{k:'wed',l:'พุธ',idx:3},{k:'thu',l:'พฤหัส',idx:4},{k:'fri',l:'ศุกร์',idx:5},{k:'sat',l:'เสาร์',idx:6},{k:'sun',l:'อาทิตย์',idx:7}];
 const TIMES = ['19-20','20-21','21-22','23-24','00-01'];
-const SLOTS = {
-  tue: {'19-20':'77', '21-22':'55', '23-24':'77'},
-  wed: {'19-20':'55', '23-24':'77'},
-  thu: {'20-21':'77', '23-24':'55'},
-  fri: {'00-01':'77'},
-  sat: {'00-01':'77'},
-  sun: {'19-20':'55'}
-};
+const SLOTS = {tue:{'19-20':'77','21-22':'55','23-24':'77'},wed:{'19-20':'55','23-24':'77'},thu:{'20-21':'77','23-24':'55'},fri:{'00-01':'77'},sat:{'00-01':'77'},sun:{'19-20':'55'}};
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 let user = localStorage.getItem('raidUser');
+let nickname = localStorage.getItem('raidNick') || '';
+let isAdmin = false;
 let selectedChar = null;
+let selectedTeam = null;
 let signups = [];
-
-function getFormattedDates() {
-  const now = new Date();
-  let currentDayIdx = now.getDay(); 
-  if (currentDayIdx === 0) currentDayIdx = 7; 
-
-  return DAYS.map(day => {
-    const diff = day.idx - currentDayIdx;
-    const d = new Date();
-    d.setDate(now.getDate() + diff);
-    const dateStr = `${d.getDate()} / ${monthNames[d.getMonth()]} / ${d.getFullYear()}`;
-    return { ...day, dateStr, isToday: day.idx === currentDayIdx };
-  });
-}
-
-function getWeekKey() {
-  const now = new Date();
-  let day = now.getDay();
-  if (day === 0) day = 7; 
-  const diff = now.getDate() - day + 1;
-  const monday = new Date(now.setDate(diff));
-  return monday.toISOString().slice(0,10);
-}
 
 window.onload = async () => {
   if(user) {
+    if(user === 'admin') isAdmin = true;
     document.getElementById('n-user').textContent = user;
+    document.getElementById('n-nick').textContent = nickname;
+    if(isAdmin) document.getElementById('tab-admin-btn').style.display = 'block';
     await sync();
-    show('app-page');
-  } else { show('auth-page'); }
+    showPage('app-page');
+  } else { showPage('auth-page'); }
   renderChars();
+};
+
+window.togglePass = (id) => {
+  const input = document.getElementById(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+};
+
+window.switchTab = (t) => {
+  document.getElementById('login-form').style.display = t==='login'?'block':'none';
+  document.getElementById('reg-form').style.display = t==='register'?'block':'none';
+  document.getElementById('tab-login-btn').classList.toggle('active', t==='login');
+  document.getElementById('tab-reg-btn').classList.toggle('active', t==='register');
+};
+
+window.switchView = (v) => {
+  const views = ['arena', 'list', 'admin', 'profile'];
+  views.forEach(view => document.getElementById('view-'+view).style.display = v===view?'block':'none');
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  if(document.getElementById('tab-'+v+'-btn')) document.getElementById('tab-'+v+'-btn').classList.add('active');
+  if(v==='list') renderOverview();
+  if(v==='admin') loadAdminUsers();
+};
+
+window.doLogin = async () => {
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  if(u === 'admin' && p === 'admingun') {
+    localStorage.setItem('raidUser', 'admin');
+    localStorage.setItem('raidNick', 'ผู้ดูแลระบบ');
+    location.reload(); return;
+  }
+  const { data } = await supabase.from('users').select('*').eq('username',u).eq('password',btoa(p)).single();
+  if(data) {
+    localStorage.setItem('raidUser', u);
+    localStorage.setItem('raidNick', data.nickname || u);
+    location.reload();
+  } else { msg("Username/Password ผิด", "red"); }
+};
+
+window.doRegister = async () => {
+  const u = document.getElementById('r-user').value.trim();
+  const n = document.getElementById('r-nick').value.trim();
+  const p1 = document.getElementById('r-pass').value;
+  const p2 = document.getElementById('r-pass2').value;
+  const ph = document.getElementById('r-phone').value.trim();
+  if(p1 !== p2) { msg("Password ไม่ตรงกัน", "red"); return; }
+  const { error } = await supabase.from('users').insert([{username:u, password:btoa(p1), nickname:n, phone:ph}]);
+  if(!error) { alert("สมัครสำเร็จ!"); switchTab('login'); }
+  else { msg("ชื่อผู้ใช้นี้มีคนใช้แล้ว", "red"); }
+};
+
+window.doLogout = () => { localStorage.clear(); location.reload(); };
+
+window.openProfile = () => {
+  document.getElementById('p-nick').value = nickname;
+  switchView('profile');
+};
+
+window.updateProfile = async () => {
+  const n = document.getElementById('p-nick').value.trim();
+  const p = document.getElementById('p-pass').value;
+  const updates = { nickname: n };
+  if(p) updates.password = btoa(p);
+  const { error } = await supabase.from('users').update(updates).eq('username', user);
+  if(!error) {
+    localStorage.setItem('raidNick', n);
+    alert("แก้ไขสำเร็จ!"); location.reload();
+  }
 };
 
 async function sync() {
   const { data } = await supabase.from('signups').select('*');
   signups = data || [];
   renderSchedule();
-  if(document.getElementById('view-list').style.display !== 'none') renderOverview();
 }
 
-supabase.channel('any').on('postgres_changes', {event:'*', schema:'public', table:'signups'}, sync).subscribe();
+function getDates() {
+  const now = new Date();
+  let curIdx = now.getDay() === 0 ? 7 : now.getDay();
+  return DAYS.map(d => {
+    const date = new Date();
+    date.setDate(now.getDate() + (d.idx - curIdx));
+    return { ...d, dateStr: `${date.getDate()} / ${MONTHS[date.getMonth()]} / ${date.getFullYear()}`, isToday: d.idx === curIdx };
+  });
+}
+
+function renderChars() {
+  document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join('');
+}
+window.setChar = (id) => { selectedChar = id; renderChars(); };
+window.setTeam = (id) => { 
+  selectedTeam = id; 
+  document.querySelectorAll('.team-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('team-'+id).classList.add('selected');
+};
 
 function renderSchedule() {
-  const dates = getFormattedDates();
+  const dates = getDates();
   let h = '';
   dates.forEach(day => {
-    const rowClass = day.isToday ? 'today-row' : '';
-    const labelClass = day.isToday ? 'today-label' : '';
-    h += `<tr class="${rowClass}"><td class="${labelClass}">${day.l}<br><span style="font-size:0.6rem; opacity:0.6">${day.dateStr}</span></td>`;
+    h += `<tr class="${day.isToday?'today-row':''}"><td><span class="date-big">${day.l}</span><br><span style="font-size:0.6rem; opacity:0.6">${day.dateStr}</span></td>`;
     TIMES.forEach(t => {
       const type = (SLOTS[day.k] && SLOTS[day.k][t]) || null;
       if(!type) { h += '<td>-</td>'; return; }
       const key = `${day.k}_${t}`;
       const players = signups.filter(s => s.slot_key === key);
       const isMe = players.some(s => s.username === user);
-      const max = type==='77'?7:5;
-      h += `<td><div class="slot-container"><div class="slot-info" style="color:${type==='77'?'var(--gold)':'var(--cyan)'}">${type==='77'?'7v7':'5v5'}</div><div class="slot-count">${players.length}/${max}</div><div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${ (players.length>=max && !isMe) || isMe ? 'disabled' : '' }>ลงชื่อ</button><button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${ !isMe ? 'disabled' : '' }>ออก</button></div></div></td>`;
+      h += `<td><div class="slot-container"><div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${players.length}/${type==='77'?7:5})</div>
+      <div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe?'disabled':''}>ลงชื่อเข้า</button>
+      <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ลงชื่อออก</button></div></div></td>`;
     });
     h += '</tr>';
   });
-  document.getElementById('join-body').innerHTML = h;
+  document.getElementById('arena-body').innerHTML = h;
 }
 
 function renderOverview() {
-  const dates = getFormattedDates();
-  let h = '';
-  dates.forEach(day => {
-    h += `<tr class="${day.isToday?'today-row':''}"><td style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${day.l}<br><span style="font-size:0.6rem; color:var(--text-dim)">${day.dateStr}</span></td>`;
-    TIMES.forEach(t => {
-      const type = (SLOTS[day.k] && SLOTS[day.k][t]) || null;
-      if(!type) { h += '<td>-</td>'; return; }
-      const key = `${day.k}_${t}`;
-      const players = signups.filter(s => s.slot_key === key);
-      let playerHtml = players.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji || '❓'} ${p.username}</span><span class="player-info">📞 ${p.phone || '-'}</span></div>`).join('');
-      h += `<td><div style="font-size:0.7rem; margin-bottom:8px; font-weight:bold; color:${type==='77'?'var(--gold)':'var(--cyan)'}">${type==='77'?'7v7':'5v5'} (${players.length}/${type==='77'?7:5})</div><div style="display:flex; flex-direction:column; gap:2px;">${playerHtml || '<span style="opacity:0.3;font-size:0.7rem;">ว่าง</span>'}</div></td>`;
+  const dates = getDates();
+  let html = '';
+  [1, 2, 3].forEach(teamNum => {
+    html += `<div class="section-label">ทีม ${teamNum}</div><div class="table-wrapper"><table><thead><tr><th>วัน/เวลา</th>`;
+    TIMES.forEach(t => html += `<th>${t}</th>`);
+    html += `</tr></thead><tbody>`;
+    dates.forEach(day => {
+      html += `<tr><td>${day.l}</td>`;
+      TIMES.forEach(t => {
+        const key = `${day.k}_${t}`;
+        const teamPlayers = signups.filter(s => s.slot_key === key && s.team === String(teamNum));
+        let pList = teamPlayers.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span><span style="font-size:0.6rem; color:var(--cyan)">📞 ${p.phone || '-'}</span></div>`).join('');
+        html += `<td>${pList || '-'}</td>`;
+      });
+      html += `</tr>`;
     });
-    h += '</tr>';
+    html += `</tbody></table></div>`;
   });
-  document.getElementById('list-body').innerHTML = h;
+  document.getElementById('overview-content').innerHTML = html;
 }
 
 window.handleJoin = async (key) => {
-  if(!selectedChar) { showToast("⚠️ กรุณาเลือกตัวละครก่อน!"); return; }
+  if(!selectedChar || !selectedTeam) { showToast("⚠️ โปรดเลือกตัวละครและทีมก่อน!"); return; }
   const c = CHARS.find(x => x.id === selectedChar);
-  const phone = localStorage.getItem('raidPhone') || '-';
-  const { error } = await supabase.from('signups').insert([{
-    week_key: getWeekKey(),
-    slot_key: key, 
-    username: user, 
-    char_id: c.id, 
-    char_emoji: c.emoji, 
-    phone: phone,
-    ts: Date.now()
-  }]);
-  if(error) { showToast("❌ เกิดข้อผิดพลาด"); console.error(error); } 
-  else { showToast("✅ ลงชื่อสำเร็จ!"); await sync(); }
+  await supabase.from('signups').insert([{ slot_key: key, username: user, nickname: nickname, char_id: c.id, char_emoji: c.emoji, team: selectedTeam, phone: localStorage.getItem('raidPhone') || '' }]);
+  showToast("✅ ลงชื่อสำเร็จ!"); sync();
 };
 
 window.handleLeave = async (key) => {
   const has = signups.find(s => s.slot_key === key && s.username === user);
-  if(has) {
-    await supabase.from('signups').delete().eq('id', has.id);
-    showToast("🔔 ยกเลิกสำเร็จ");
-    await sync();
+  if(has) { await supabase.from('signups').delete().eq('id', has.id); showToast("🔔 ออกแล้ว"); sync(); }
+};
+
+// Admin Logic
+async function loadAdminUsers() {
+  const { data } = await supabase.from('users').select('*');
+  let h = '';
+  data.forEach(u => {
+    h += `<div class="user-list-item">
+      <span>${u.username} (${u.nickname || 'ไม่มีชื่อเล่น'})</span>
+      <div>
+        <button onclick="adminEdit('${u.username}')" style="background:var(--cyan); border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">แก้</button>
+        <button onclick="adminDel('${u.username}')" style="background:var(--red); border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-left:5px;">ลบ</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('admin-user-list').innerHTML = h;
+}
+
+window.adminEdit = async (targetUser) => {
+  const newNick = prompt("ชื่อเล่นใหม่:");
+  const newPass = prompt("รหัสผ่านใหม่ (ปล่อยว่างถ้าไม่เปลี่ยน):");
+  const updates = { nickname: newNick };
+  if(newPass) updates.password = btoa(newPass);
+  await supabase.from('users').update(updates).eq('username', targetUser);
+  loadAdminUsers();
+};
+
+window.adminDel = async (targetUser) => {
+  if(confirm("ลบ User นี้?")) {
+    await supabase.from('users').delete().eq('username', targetUser);
+    loadAdminUsers();
   }
 };
 
-window.setChar = (id) => { selectedChar = id; renderChars(); };
-function renderChars() {
-  document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join('');
-}
-window.switchTab = (t) => {
-  document.getElementById('login-form').style.display = t==='login'?'block':'none';
-  document.getElementById('reg-form').style.display = t==='register'?'block':'none';
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.includes(t==='login'?'เข้า':'สมัคร')));
-};
-window.switchView = (v) => {
-  document.getElementById('view-join').style.display = v==='join'?'block':'none';
-  document.getElementById('view-list').style.display = v==='list'?'block':'none';
-  document.getElementById('tab-join').classList.toggle('active', v==='join');
-  document.getElementById('tab-list').classList.toggle('active', v==='list');
-  if(v === 'list') renderOverview();
-};
-window.doLogin = async () => {
-  const u = document.getElementById('l-user').value.trim();
-  const p = btoa(document.getElementById('l-pass').value);
-  const { data } = await supabase.from('users').select('*').eq('username',u).eq('password',p).single();
-  if(data) {
-    localStorage.setItem('raidUser', u);
-    localStorage.setItem('raidPhone', data.phone || '');
-    location.reload();
-  } else { msg("Username/Password ผิด", "#f55a42"); }
-};
-window.doRegister = async () => {
-  const u = document.getElementById('r-user').value.trim();
-  const p = btoa(document.getElementById('r-pass').value);
-  const ph = document.getElementById('r-phone').value.trim();
-  if(!u || !ph) { msg("กรุณากรอกข้อมูลให้ครบ", "#f55a42"); return; }
-  const { error } = await supabase.from('users').insert([{username:u, password:p, phone:ph}]);
-  if(!error) { alert("สมัครสำเร็จ!"); location.reload(); }
-  else { msg("ชื่อผู้ใช้นี้มีคนใช้แล้ว", "#f55a42"); }
-};
-window.doLogout = () => { localStorage.clear(); location.reload(); };
-function show(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-function msg(t, c) {
-  const e = document.getElementById('auth-msg'); e.textContent = t; e.style.color = c;
-}
-function showToast(m) {
-  const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 2000);
-}
+function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function msg(t, c) { const e = document.getElementById('auth-msg'); e.textContent = t; e.style.color = c; }
+function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 2000); }
+
+supabase.channel('any').on('postgres_changes', {event:'*', schema:'public', table:'signups'}, sync).subscribe();
 </script>
 </body>
 </html>
