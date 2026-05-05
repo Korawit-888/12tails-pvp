@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.05.1</title>
+<title>12Tails Arena PVP - Rev.05.5</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -36,9 +36,7 @@
   input { width: 100%; background: var(--bg-darker); border: 1px solid var(--border); color: #fff; padding: 0.9rem; border-radius: 10px; outline: none; }
   .toggle-pass { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; opacity: 0.5; }
 
-  .btn-primary { width: 100%; padding: 0.9rem; border: none; border-radius: 10px; background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; }
-  .btn-primary:disabled { background: #444; color: #888; cursor: not-allowed; }
-
+  .btn-primary { width: 100%; padding: 0.9rem; border: none; border-radius: 10px; background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
   .main { padding: 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%; }
   .section-label { color: var(--gold); font-size: 1rem; font-family: 'Kanit'; font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
 
@@ -58,7 +56,7 @@
   .btn-action-group { display: flex; gap: 4px; width: 100%; }
   .btn-sign { flex: 1; padding: 6px 2px; border: none; border-radius: 4px; font-family: 'Kanit'; font-size: 0.75rem; font-weight: bold; cursor: pointer; }
   .btn-in { background: rgba(66, 245, 164, 0.1); color: var(--green); border: 1px solid rgba(66, 245, 164, 0.3); }
-  .btn-in:disabled { opacity: 0.2; cursor: not-allowed; }
+  .btn-in:disabled { opacity: 0.1; cursor: not-allowed; }
   .btn-out { background: rgba(245, 90, 66, 0.1); color: var(--red); border: 1px solid rgba(245, 90, 66, 0.3); }
   .active-in { background: var(--green) !important; color: #000 !important; }
 
@@ -66,6 +64,7 @@
   .player-name { font-weight: bold; color: #fff; }
 
   .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: bold; display: none; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .admin-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 12px; margin-bottom: 8px; border-radius: 12px; border: 1px solid var(--border); }
 </style>
 </head>
 <body>
@@ -103,8 +102,8 @@
     <div style="color:var(--gold); font-weight:bold; font-family:Cinzel;">⚔️ ARENA PVP</div>
     <div style="font-size:0.85rem;">
       <span id="n-nick" style="color:var(--gold); font-weight:bold;"></span> (<span id="n-user"></span>) | 
-      <a href="#" onclick="openProfile()" style="color:var(--cyan); text-decoration:none;">ตั้งค่า</a> |
-      <a href="#" onclick="doLogout()" style="color:var(--red); text-decoration:none;">ออก</a>
+      <a href="javascript:void(0)" onclick="openProfile()" style="color:var(--cyan); text-decoration:none;">ตั้งค่า</a> |
+      <a href="javascript:void(0)" onclick="doLogout()" style="color:var(--red); text-decoration:none;">ออก</a>
     </div>
   </nav>
 
@@ -144,10 +143,10 @@
   <div id="view-profile" class="main" style="display:none">
     <div class="auth-box" style="margin: 0 auto;">
       <div class="section-label">ตั้งค่าบัญชี</div>
-      <input type="text" id="p-nick" placeholder="เปลี่ยนชื่อเล่น">
-      <div class="input-group"><input type="password" id="p-pass" placeholder="รหัสผ่านใหม่"><span class="toggle-pass" onclick="togglePass('p-pass')">👁️</span></div>
-      <button class="btn-primary" onclick="updateProfile()">บันทึกการแก้ไข</button>
-      <button class="btn-primary" style="background:#333; color:white; margin-top:10px;" onclick="switchView('arena')">กลับ</button>
+      <div class="input-group"><input type="text" id="p-nick" placeholder="เปลี่ยนชื่อเล่น"></div>
+      <div class="input-group"><input type="password" id="p-pass" placeholder="รหัสผ่านใหม่ (ว่างไว้ถ้าไม่เปลี่ยน)"><span class="toggle-pass" onclick="togglePass('p-pass')">👁️</span></div>
+      <button class="btn-primary" onclick="updateProfile()">💾 บันทึกการแก้ไข</button>
+      <button class="btn-primary" style="background:#333; color:white;" onclick="switchView('arena')">ย้อนกลับ</button>
     </div>
   </div>
 </div>
@@ -193,31 +192,124 @@ async function sync() {
 
 supabase.channel('any').on('postgres_changes', {event:'*', schema:'public', table:'signups'}, sync).subscribe();
 
-function getDates() {
-  const now = new Date();
-  let curIdx = now.getDay() === 0 ? 7 : now.getDay();
-  return DAYS.map(d => {
-    const date = new Date();
-    date.setDate(now.getDate() + (d.idx - curIdx));
-    return { ...d, dateStr: `${date.getDate()} / ${MONTHS[date.getMonth()]} / ${date.getFullYear()}`, isToday: d.idx === curIdx };
+// Navigation & Tabs
+window.switchTab = (t) => {
+  document.getElementById('login-form').style.display = t==='login'?'block':'none';
+  document.getElementById('reg-form').style.display = t==='register'?'block':'none';
+  document.getElementById('tab-login-btn').classList.toggle('active', t==='login');
+  document.getElementById('tab-reg-btn').classList.toggle('active', t==='register');
+};
+
+window.switchView = (v) => {
+  document.querySelectorAll('.main').forEach(m => m.style.display='none');
+  document.getElementById('view-'+v).style.display='block';
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.id==='tab-'+v+'-btn'));
+  if(v==='list') renderOverview();
+  if(v==='admin') loadUsersAdmin();
+};
+
+window.togglePass = (id) => { const i = document.getElementById(id); i.type = i.type==='password'?'text':'password'; };
+
+// Auth Actions
+window.doLogin = async () => {
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  if(u==='admin'&&p==='admingun'){
+    localStorage.setItem('raidUser','admin'); localStorage.setItem('raidNick','Admin');
+    location.reload(); return;
+  }
+  const {data} = await supabase.from('users').select('*').eq('username',u).eq('password',btoa(p)).single();
+  if(data){
+    localStorage.setItem('raidUser',u); localStorage.setItem('raidNick',data.nickname);
+    localStorage.setItem('raidPhone',data.phone); location.reload();
+  } else msg("Username หรือ Password ไม่ถูกต้อง","red");
+};
+
+window.doRegister = async () => {
+  const u=document.getElementById('r-user').value.trim(), n=document.getElementById('r-nick').value.trim(), p1=document.getElementById('r-pass').value, p2=document.getElementById('r-pass2').value, ph=document.getElementById('r-phone').value.trim();
+  if(!u || !n || !p1) { msg("กรุณากรอกข้อมูลให้ครบ","red"); return; }
+  if(p1!==p2){ msg("Password ไม่ตรงกัน","red"); return; }
+  const {error} = await supabase.from('users').insert([{username:u,password:btoa(p1),nickname:n,phone:ph}]);
+  if(!error){ alert("สมัครสมาชิกสำเร็จ!"); switchTab('login'); } else msg("Username นี้ถูกใช้ไปแล้ว","red");
+};
+
+window.doLogout = () => { localStorage.clear(); location.reload(); };
+
+// Profile Actions
+window.openProfile = () => {
+  document.getElementById('p-nick').value = nickname;
+  switchView('profile');
+};
+
+window.updateProfile = async () => {
+  const newNick = document.getElementById('p-nick').value.trim();
+  const newPass = document.getElementById('p-pass').value;
+  if(!newNick) return alert("กรุณาระบุชื่อเล่น");
+  const upData = { nickname: newNick };
+  if(newPass) upData.password = btoa(newPass);
+  const { error } = await supabase.from('users').update(upData).eq('username', user);
+  if(!error) {
+    localStorage.setItem('raidNick', newNick);
+    alert("อัปเดตข้อมูลสำเร็จ!");
+    location.reload();
+  } else { alert("เกิดข้อผิดพลาดในการอัปเดต"); }
+};
+
+// Admin Actions
+async function loadUsersAdmin() {
+  const container = document.getElementById('admin-user-list');
+  container.innerHTML = 'กำลังโหลด...';
+  const { data, error } = await supabase.from('users').select('*');
+  if(error) { container.innerHTML = 'เกิดข้อผิดพลาดในการดึงข้อมูล (ตรวจสอบ RLS)'; return; }
+  let h = '';
+  data.forEach(u => {
+    if(u.username === 'admin') return;
+    h += `<div class="admin-item">
+      <span><strong>${u.username}</strong> (${u.nickname})</span>
+      <div>
+        <button onclick="editUserAdmin('${u.username}')" style="background:var(--cyan); border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">แก้</button>
+        <button onclick="delUserAdmin('${u.username}')" style="background:var(--red); border:none; padding:5px 10px; border-radius:5px; cursor:pointer; margin-left:5px;">ลบ</button>
+      </div>
+    </div>`;
   });
+  container.innerHTML = h || 'ไม่มีผู้ใช้งานอื่น';
 }
+window.editUserAdmin = async (target) => {
+  const n = prompt("ชื่อเล่นใหม่:");
+  const p = prompt("รหัสผ่านใหม่ (ว่างไว้ถ้าไม่เปลี่ยน):");
+  if(n === null) return;
+  const up = { nickname: n }; if(p) up.password = btoa(p);
+  await supabase.from('users').update(up).eq('username', target);
+  loadUsersAdmin();
+};
+window.delUserAdmin = async (target) => { if(confirm("ต้องการลบ User นี้?")) { await supabase.from('users').delete().eq('username', target); loadUsersAdmin(); } };
+
+// Arena Logic
+window.setChar = (id) => { selectedChar = id; renderChars(); };
+window.setTeam = (id) => { selectedTeam = id; document.querySelectorAll('.team-card').forEach(c => c.classList.toggle('selected', c.id==='team-'+id)); };
 
 function renderSchedule() {
-  const dates = getDates();
+  const now = new Date();
+  let curIdx = now.getDay() === 0 ? 7 : now.getDay();
   let h = '';
-  dates.forEach(day => {
-    h += `<tr class="${day.isToday?'today-row':''}"><td><span class="date-big">${day.l}</span><br><span style="font-size:0.6rem; opacity:0.6">${day.dateStr}</span></td>`;
+  DAYS.forEach(day => {
+    const d = new Date(); d.setDate(now.getDate() + (day.idx - curIdx));
+    const dateStr = `${d.getDate()} / ${MONTHS[d.getMonth()]} / ${d.getFullYear()}`;
+    h += `<tr class="${day.idx===curIdx?'today-row':''}"><td><span class="date-big">${day.l}</span><br><span style="font-size:0.6rem; opacity:0.6">${dateStr}</span></td>`;
     TIMES.forEach(t => {
       const type = (SLOTS[day.k] && SLOTS[day.k][t]) || null;
       if(!type) { h += '<td>-</td>'; return; }
       const key = `${day.k}_${t}`;
-      const players = signups.filter(s => s.slot_key === key);
-      const isMeInThisSlot = players.some(s => s.username === user);
+      const slotPlayers = signups.filter(s => s.slot_key === key);
+      const isMe = slotPlayers.some(s => s.username === user);
       const max = type==='77'?7:5;
-      h += `<td><div class="slot-container"><div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${players.length}/${max})</div>
-      <div class="btn-action-group"><button class="btn-sign btn-in ${isMeInThisSlot?'active-in':''}" onclick="handleJoin('${key}')" ${isMeInThisSlot || players.length>=max ? 'disabled' : ''}>ลงชื่อเข้า</button>
-      <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMeInThisSlot ? 'disabled' : ''}>ลงชื่อออก</button></div></div></td>`;
+      h += `<td><div class="slot-container">
+        <div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${slotPlayers.length}/${max})</div>
+        <div class="btn-action-group">
+          <button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe || slotPlayers.length>=max ? 'disabled' : ''}>ลงชื่อเข้า</button>
+          <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe ? 'disabled' : ''}>ออก</button>
+        </div>
+      </div></td>`;
     });
     h += '</tr>';
   });
@@ -225,19 +317,20 @@ function renderSchedule() {
 }
 
 function renderOverview() {
-  const dates = getDates();
+  const now = new Date();
+  let curIdx = now.getDay() === 0 ? 7 : now.getDay();
   let html = '';
   [1, 2, 3].forEach(teamNum => {
     html += `<div class="section-label">ทีม ${teamNum}</div><div class="table-wrapper"><table><thead><tr><th>วัน</th>`;
     TIMES.forEach(t => html += `<th>${t}</th>`);
     html += `</tr></thead><tbody>`;
-    dates.forEach(day => {
-      html += `<tr><td>${day.l}<br><span style="font-size:0.5rem; opacity:0.5;">${day.dateStr}</span></td>`;
+    DAYS.forEach(day => {
+      html += `<tr><td>${day.l}</td>`;
       TIMES.forEach(t => {
         const key = `${day.k}_${t}`;
         const teamPlayers = signups.filter(s => s.slot_key === key && String(s.team) === String(teamNum));
-        let pList = teamPlayers.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span><span style="font-size:0.6rem; color:var(--cyan)">📞 ${p.phone || '-'}</span></div>`).join('');
-        html += `<td>${pList || '-'}</td>`;
+        let list = teamPlayers.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span></div>`).join('');
+        html += `<td>${list || '-'}</td>`;
       });
       html += `</tr>`;
     });
@@ -247,38 +340,32 @@ function renderOverview() {
 }
 
 window.handleJoin = async (key) => {
-  if(!selectedChar || !selectedTeam) { showToast("⚠️ โปรดเลือกตัวละครและทีมก่อน!"); return; }
+  if(!selectedChar || !selectedTeam) { showToast("⚠️ เลือกตัวละครและทีมก่อน!"); return; }
+  // เช็คว่าวันนี้ลงเวลาเดียวกันทีมอื่นไปหรือยัง
+  const alreadyInThisSlot = signups.some(s => s.slot_key === key && s.username === user);
+  if(alreadyInThisSlot) { showToast("⚠️ คุณลงชื่อรอบนี้ไปแล้ว!"); return; }
+
   const { error } = await supabase.from('signups').insert([{ 
-    slot_key: key, 
-    username: user, 
-    nickname: nickname, 
-    char_id: selectedChar, 
-    char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, 
-    team: selectedTeam, 
-    phone: localStorage.getItem('raidPhone') || '',
+    slot_key: key, username: user, nickname: nickname, 
+    char_id: selectedChar, char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, 
+    team: selectedTeam, phone: localStorage.getItem('raidPhone') || '',
     week_key: new Date().toISOString().split('T')[0]
   }]);
-  if(error) { showToast("❌ ข้อผิดพลาด"); console.error(error); }
-  else { showToast("✅ ลงชื่อสำเร็จ!"); sync(); }
+  if(!error) { showToast("✅ ลงชื่อสำเร็จ!"); sync(); }
+  else { showToast("❌ เกิดข้อผิดพลาด"); }
 };
 
 window.handleLeave = async (key) => {
   const has = signups.find(s => s.slot_key === key && s.username === user);
-  if(has) { await supabase.from('signups').delete().eq('id', has.id); showToast("🔔 ออกแล้ว"); sync(); }
+  if(has) { await supabase.from('signups').delete().eq('id', has.id); showToast("🔔 ลงชื่อออกแล้ว"); sync(); }
 };
 
-window.setChar = (id) => { selectedChar = id; renderChars(); };
-window.setTeam = (id) => { selectedTeam = id; document.querySelectorAll('.team-card').forEach(c => c.classList.toggle('selected', c.id==='team-'+id)); };
-window.togglePass = (id) => { const i = document.getElementById(id); i.type = i.type==='password'?'text':'password'; };
-window.switchTab = (t) => { document.getElementById('login-form').style.display = t==='login'?'block':'none'; document.getElementById('reg-form').style.display = t==='register'?'block':'none'; document.getElementById('tab-login-btn').classList.toggle('active', t==='login'); document.getElementById('tab-reg-btn').classList.toggle('active', t==='register'); };
-window.switchView = (v) => { document.querySelectorAll('.main').forEach(m => m.style.display='none'); document.getElementById('view-'+v).style.display='block'; document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.id==='tab-'+v+'-btn')); if(v==='list') renderOverview(); };
-window.doLogin = async () => { const u = document.getElementById('l-user').value.trim(), p = document.getElementById('l-pass').value; if(u==='admin'&&p==='admingun'){ localStorage.setItem('raidUser','admin'); localStorage.setItem('raidNick','Admin'); location.reload(); return; } const {data} = await supabase.from('users').select('*').eq('username',u).eq('password',btoa(p)).single(); if(data){ localStorage.setItem('raidUser',u); localStorage.setItem('raidNick',data.nickname); localStorage.setItem('raidPhone',data.phone); location.reload(); } else msg("Username/Password ผิด","red"); };
-window.doRegister = async () => { const u=document.getElementById('r-user').value.trim(), n=document.getElementById('r-nick').value.trim(), p1=document.getElementById('r-pass').value, p2=document.getElementById('r-pass2').value, ph=document.getElementById('r-phone').value.trim(); if(p1!==p2){ msg("Password ไม่ตรงกัน","red"); return; } const {error} = await supabase.from('users').insert([{username:u,password:btoa(p1),nickname:n,phone:ph}]); if(!error){ alert("สำเร็จ!"); switchTab('login'); } else msg("Username ซ้ำ","red"); };
-window.doLogout = () => { localStorage.clear(); location.reload(); };
+// Utils
 function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function msg(t,c) { const e=document.getElementById('auth-msg'); e.textContent=t; e.style.color=c; }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
 function renderChars() { document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join(''); }
+
 </script>
 </body>
 </html>
