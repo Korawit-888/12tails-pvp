@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.06</title>
+<title>12Tails Arena PVP - Rev.06.1</title>
 <style>
-  /* CSS ทั้งหมดคงเดิมจาก Rev.05.9 */
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
   :root {
@@ -123,13 +122,15 @@
   <div id="view-arena" class="main">
     <div class="section-label"><b>1. เลือกตัวละคร</b></div>
     <div class="char-grid" id="char-list"></div>
-    <div class="section-label"><b>3. เลือกทีม</b></div>
+
+    <div class="section-label"><b>2. เลือกทีม</b></div>
     <div class="team-grid" id="team-list">
       <div class="team-card" id="team-1" onclick="setTeam('1')">ทีม 1</div>
       <div class="team-card" id="team-2" onclick="setTeam('2')">ทีม 2</div>
       <div class="team-card" id="team-3" onclick="setTeam('3')">ทีม 3</div>
     </div>
-    <div class="section-label"><b>2. ตารางเวลา / ลงชื่อ</b></div>
+
+    <div class="section-label"><b>3. ตารางเวลา / ลงชื่อ</b></div>
     <div class="table-wrapper">
       <table>
         <thead><tr><th>วัน</th><th>19:00 - 20:00</th><th>20:00 - 21:00</th><th>21:00 - 22:00</th><th>23:00 - 00:00</th><th>00:00 - 01:00</th></tr></thead>
@@ -138,9 +139,7 @@
     </div>
   </div>
 
-  <div id="view-list" class="main" style="display:none">
-    <div id="overview-content"></div>
-  </div>
+  <div id="view-list" class="main" style="display:none"><div id="overview-content"></div></div>
 
   <div id="view-admin" class="main" style="display:none">
     <div class="section-label">🛡️ จัดการผู้ใช้งาน (Admin)</div>
@@ -168,17 +167,12 @@ const SUPABASE_URL = "https://vkxncgkipevoblwbqmlp.supabase.co";
 const SUPABASE_KEY = "sb_publishable_kZLsrPjyix00ONTZYb7ryA_NmCl8Tq_"; 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// เพิ่มตัวละคร แมว 🐱 เข้าไปในลิสต์
 const CHARS = [
-  {id:'wolf',emoji:'🐺',n:'หมา'},
-  {id:'sheep',emoji:'🐑',n:'แกะ'},
-  {id:'rabbit',emoji:'🐰',n:'ต่าย'},
-  {id:'bat',emoji:'🦇',n:'ค้างคาว'},
-  {id:'penguin',emoji:'🐧',n:'กวิ้น'},
-  {id:'cat',emoji:'🐱',n:'แมว'} // เพิ่มบรรทัดนี้
+  {id:'wolf',emoji:'🐺',n:'หมา'}, {id:'sheep',emoji:'🐑',n:'แกะ'},
+  {id:'rabbit',emoji:'🐰',n:'ต่าย'}, {id:'bat',emoji:'🦇',n:'ค้างคาว'},
+  {id:'penguin',emoji:'🐧',n:'กวิ้น'}, {id:'cat',emoji:'🐱',n:'แมว'}
 ];
 
-// ส่วนที่เหลือของ Script คงเดิมจาก Rev.05.9
 const DAYS = [{k:'mon',l:'จันทร์',idx:1},{k:'tue',l:'อังคาร',idx:2},{k:'wed',l:'พุธ',idx:3},{k:'thu',l:'พฤหัส',idx:4},{k:'fri',l:'ศุกร์',idx:5},{k:'sat',l:'เสาร์',idx:6},{k:'sun',l:'อาทิตย์',idx:7}];
 const TIMES_LABELS = ['19:00 - 20:00','20:00 - 21:00','21:00 - 22:00','23:00 - 00:00','00:00 - 01:00'];
 const TIMES_KEYS = ['19-20','20-21','21-22','23-24','00-01'];
@@ -336,7 +330,7 @@ function renderSchedule() {
       const max = type==='77'?7:5;
       h += `<td><div class="slot-container"><div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${ps.length}/${max})</div>
       <div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=max?'disabled':''}>ลงชื่อเข้า</button>
-      <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ออก</button></div></div></td>`;
+      <button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ลงชื่อออก</button></div></div></td>`;
     });
     h += '</tr>';
   });
@@ -346,22 +340,16 @@ function renderSchedule() {
 function renderOverview() {
   const dates = getDates();
   let html = '';
-  [1, 2, 3].forEach(teamNum => {
-    html += `<div class="section-label">ทีม ${teamNum}</div><div class="table-wrapper"><table><thead><tr><th>วัน</th>`;
+  [1, 2, 3].forEach(num => {
+    html += `<div class="section-label">ทีม ${num}</div><div class="table-wrapper"><table><thead><tr><th>วัน</th>`;
     TIMES_LABELS.forEach(t => html += `<th>${t}</th>`);
     html += `</tr></thead><tbody>`;
     dates.forEach(day => {
       html += `<tr class="${day.isToday?'today-row':''}"><td><span style="font-weight:bold; color:var(--gold); font-size:0.9rem;">${day.l}</span><br><span style="font-size:0.65rem; opacity:0.7;">${day.dateStr}</span></td>`;
       TIMES_KEYS.forEach(t => {
         const key = `${day.k}_${t}`;
-        const teamPlayers = signups.filter(s => s.slot_key === key && String(s.team) === String(teamNum));
-        let list = teamPlayers.map(p => `
-          <div class="player-tag">
-            <span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span>
-            <span style="font-size:0.65rem; color:var(--cyan)">📞 ${p.phone || '-'}</span>
-            ${user==='admin' ? `<button class="btn-admin-del" onclick="adminKick('${p.id}')">ลบ</button>` : ''}
-          </div>
-        `).join('');
+        const ps = signups.filter(s => s.slot_key === key && String(s.team) === String(num));
+        let list = ps.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span><span style="font-size:0.65rem; color:var(--cyan)">📞 ${p.phone || '-'}</span>${user==='admin'?`<button class="btn-admin-del" onclick="adminKick(${p.id})">ลบ</button>`:''}</div>`).join('');
         html += `<td>${list || '-'}</td>`;
       });
       html += `</tr>`;
@@ -373,14 +361,8 @@ function renderOverview() {
 
 window.handleJoin = async (key) => {
   if(!selectedChar || !selectedTeam) { showToast("⚠️ เลือกตัวละครและทีมก่อน!"); return; }
-  if(signups.some(s => s.slot_key === key && s.username === user)) { showToast("⚠️ คุณลงรอบนี้ไปแล้ว!"); return; }
-
-  const { error } = await supabase.from('signups').insert([{ 
-    slot_key: key, username: user, nickname: nickname, 
-    char_id: selectedChar, char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, 
-    team: selectedTeam, phone: localStorage.getItem('raidPhone') || '',
-    week_key: new Date().toISOString().split('T')[0]
-  }]);
+  if(signups.some(s => s.slot_key === key && s.username === user)) { showToast("⚠️ ลงรอบนี้ไปแล้ว!"); return; }
+  const { error } = await supabase.from('signups').insert([{ slot_key: key, username: user, nickname: nickname, char_id: selectedChar, char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, team: selectedTeam, phone: localStorage.getItem('raidPhone') || '', week_key: new Date().toISOString().split('T')[0] }]);
   if(!error) { showToast("✅ ลงชื่อสำเร็จ!"); sync(); }
 };
 
@@ -392,9 +374,7 @@ window.handleLeave = async (key) => {
 function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function msg(t,c) { const e=document.getElementById('auth-msg'); e.textContent=t; e.style.color=c; }
 function showToast(m) { const t=document.getElementById('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',2000); }
-// ฟังก์ชัน renderChars เพื่อแสดงผลปุ่มเลือกตัวละคร
 function renderChars() { document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join(''); }
-
 </script>
 </body>
 </html>
