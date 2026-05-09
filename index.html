@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.07.0</title>
+<title>12Tails Arena PVP - Rev.07.1</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -235,11 +235,17 @@ window.checkEnter = (e, type) => {
 };
 
 function getWeekKey() {
-  const now = new Date();
-  const day = now.getDay() === 0 ? 6 : now.getDay() - 1; // Monday = 0
+  // ใช้เวลาไทย (UTC+7) ตลอด ไม่ใช้ toISOString() เพราะจะกลับเป็น UTC
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon, ...6=Sat
+  const offset = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Monday=0 ... Sunday=6
   const monday = new Date(now);
-  monday.setDate(now.getDate() - day);
-  return monday.toISOString().split('T')[0];
+  monday.setDate(now.getDate() - offset);
+  // สร้าง key จากเวลาไทย ไม่ใช้ toISOString
+  const y = monday.getFullYear();
+  const m = String(monday.getMonth() + 1).padStart(2, '0');
+  const d = String(monday.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 async function sync() {
