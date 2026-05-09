@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.06.8</title>
+<title>12Tails Arena PVP - Rev.06.8A</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -69,6 +69,7 @@
   .date-big { font-size: 0.95rem; font-weight: bold; color: var(--gold); }
   .date-sub { font-size: 0.65rem; opacity: 0.7; color: var(--text-dim); }
   .today-row { background: rgba(245, 200, 66, 0.05); }
+  .current-slot { background: rgba(245, 200, 66, 0.18) !important; box-shadow: inset 0 0 0 2px rgba(245, 200, 66, 0.6); }
   
   .slot-container { display: flex; flex-direction: column; align-items: center; gap: 6px; }
   .btn-action-group { display: flex; gap: 4px; width: 90%; }
@@ -292,16 +293,30 @@ window.setTeam = (id) => { selectedTeam = id; document.querySelectorAll('.team-c
 function renderChars() { document.getElementById('char-list').innerHTML = CHARS.map(c => `<div class="char-card ${selectedChar===c.id?'selected':''}" onclick="setChar('${c.id}')">${c.emoji} ${c.n}</div>`).join(''); }
 function getDates() { const now = new Date(); let curIdx = now.getDay() === 0 ? 7 : now.getDay(); return DAYS.map(d => { const date = new Date(); date.setDate(now.getDate() + (d.idx - curIdx)); return { ...d, dateStr: `${date.getDate()} / ${MONTHS[date.getMonth()]} / ${date.getFullYear()}`, isToday: d.idx === curIdx }; }); }
 
+function getCurrentSlotKey() {
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));
+  const h = now.getHours();
+  if (h === 19) return '19-20';
+  if (h === 20) return '20-21';
+  if (h === 21) return '21-22';
+  if (h === 22) return '22-23';
+  if (h === 23) return '23-24';
+  if (h === 0)  return '00-01';
+  return null;
+}
+
 function renderSchedule() {
   const dates = getDates(); let h = '';
+  const currentSlot = getCurrentSlotKey();
   dates.forEach(day => {
     h += `<tr class="${day.isToday?'today-row':''}"><td><span class="date-big">${day.l}</span><br><span class="date-sub">${day.dateStr}</span></td>`;
     TIMES_KEYS.forEach(t => {
       const type = (SLOTS[day.k] && SLOTS[day.k][t]) || null;
-      if(!type) { h += '<td>-</td>'; return; }
+      const isCurrentSlot = day.isToday && t === currentSlot;
+      if(!type) { h += `<td class="${isCurrentSlot?'current-slot':''}">-</td>`; return; }
       const key = `${day.k}_${t}`, ps = signups.filter(s => s.slot_key === key), isMe = ps.some(s => s.username === user);
       const a = ARENA_INFO[type];
-      h += `<td><div class="slot-container"><div style="font-weight:bold; color:${a.color}; font-size:0.8rem;">${a.icon} ${a.label} (${ps.length}/${a.max})</div><div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=a.max?'disabled':''}>ลงชื่อเข้า</button><button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ออก</button></div></div></td>`;
+      h += `<td class="${isCurrentSlot?'current-slot':''}"><div class="slot-container"><div style="font-weight:bold; color:${a.color}; font-size:0.8rem;">${a.icon} ${a.label} (${ps.length}/${a.max})</div><div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=a.max?'disabled':''}>ลงชื่อเข้า</button><button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ออก</button></div></div></td>`;
     });
     h += '</tr>';
   });
