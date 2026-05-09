@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.06.8B</title>
+<title>12Tails Arena PVP - Rev.07.0</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -160,7 +160,7 @@
     <div class="section-label"><b>3. ตารางเวลา / ลงชื่อ</b></div>
     <div class="table-wrapper">
       <table id="table-arena">
-        <thead><tr><th>วัน</th><th>19:00 - 20:00</th><th>20:00 - 21:00</th><th>21:00 - 22:00</th><th>22:00 - 23:00</th><th>23:00 - 00:00</th><th>00:00 - 01:00</th></tr></thead>
+        <thead><tr><th>วัน</th><th>00:00 - 01:00</th><th>19:00 - 20:00</th><th>20:00 - 21:00</th><th>21:00 - 22:00</th><th>22:00 - 23:00</th><th>23:00 - 00:00</th></tr></thead>
         <tbody id="arena-body"></tbody>
       </table>
     </div>
@@ -191,15 +191,15 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const CHARS = [{id:'wolf',emoji:'🐺',n:'หมา'},{id:'sheep',emoji:'🐑',n:'แกะ'},{id:'rabbit',emoji:'🐰',n:'ต่าย'},{id:'bat',emoji:'🦇',n:'ค้างคาว'},{id:'penguin',emoji:'🐧',n:'กวิ้น'},{id:'cat',emoji:'🐱',n:'แมว'},{id:'lizard',emoji:'🦎',n:'กิ้งก่า'},{id:'bison',emoji:'🦬',n:'ไบสัน'},{id:'monkey',emoji:'🐒',n:'ลิง'},{id:'panda',emoji:'🐼',n:'แพนด้า'},{id:'whale',emoji:'🐋',n:'วาฬ'},{id:'mole',emoji:'🦫',n:'ตุ่น'}];
 const DAYS = [{k:'mon',l:'จันทร์',idx:1},{k:'tue',l:'อังคาร',idx:2},{k:'wed',l:'พุธ',idx:3},{k:'thu',l:'พฤหัส',idx:4},{k:'fri',l:'ศุกร์',idx:5},{k:'sat',l:'เสาร์',idx:6},{k:'sun',l:'อาทิตย์',idx:7}];
-const TIMES_LABELS = ['19:00 - 20:00','20:00 - 21:00','21:00 - 22:00','22:00 - 23:00','23:00 - 00:00','00:00 - 01:00'];
-const TIMES_KEYS = ['19-20','20-21','21-22','22-23','23-24','00-01'];
+const TIMES_LABELS = ['00:00 - 01:00','19:00 - 20:00','20:00 - 21:00','21:00 - 22:00','22:00 - 23:00','23:00 - 00:00'];
+const TIMES_KEYS = ['00-01','19-20','20-21','21-22','22-23','23-24'];
 const SLOTS = {
-  mon:{'19-20':'33','20-21':'zappa','21-22':'1010'},
-  tue:{'19-20':'77','20-21':'zappa','21-22':'55','22-23':'1010','23-24':'77'},
+  mon:{'00-01':'33','19-20':'33','20-21':'zappa','21-22':'1010'},
+  tue:{'00-01':'zappa','19-20':'77','20-21':'zappa','21-22':'55','22-23':'1010','23-24':'77'},
   wed:{'19-20':'55','20-21':'33','21-22':'1010','23-24':'77'},
-  thu:{'19-20':'33','20-21':'77','21-22':'zappa','22-23':'1010','23-24':'55'},
-  fri:{'19-20':'33','21-22':'1010','00-01':'77'},
-  sat:{'19-20':'zappa','20-21':'33','21-22':'1010','22-23':'1010','00-01':'77'},
+  thu:{'00-01':'55','19-20':'33','20-21':'77','21-22':'zappa','22-23':'1010','23-24':'55'},
+  fri:{'00-01':'77','19-20':'33','21-22':'1010','23-24':'33'},
+  sat:{'00-01':'77','19-20':'zappa','20-21':'33','21-22':'1010','22-23':'1010','23-24':'55'},
   sun:{'19-20':'55','20-21':'33','22-23':'1010','23-24':'1010'}
 };
 const ARENA_INFO = {
