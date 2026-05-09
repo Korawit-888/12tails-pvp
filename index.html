@@ -159,7 +159,7 @@
     <div class="section-label"><b>3. ตารางเวลา / ลงชื่อ</b></div>
     <div class="table-wrapper">
       <table id="table-arena">
-        <thead><tr><th>วัน</th><th>19:00 - 20:00</th><th>20:00 - 21:00</th><th>21:00 - 22:00</th><th>23:00 - 00:00</th><th>00:00 - 01:00</th></tr></thead>
+        <thead><tr><th>วัน</th><th>19:00 - 20:00</th><th>20:00 - 21:00</th><th>21:00 - 22:00</th><th>22:00 - 23:00</th><th>23:00 - 00:00</th><th>00:00 - 01:00</th></tr></thead>
         <tbody id="arena-body"></tbody>
       </table>
     </div>
@@ -188,11 +188,26 @@ const SUPABASE_URL = "https://vkxncgkipevoblwbqmlp.supabase.co";
 const SUPABASE_KEY = "sb_publishable_kZLsrPjyix00ONTZYb7ryA_NmCl8Tq_"; 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const CHARS = [{id:'wolf',emoji:'🐺',n:'หมา'},{id:'sheep',emoji:'🐑',n:'แกะ'},{id:'rabbit',emoji:'🐰',n:'ต่าย'},{id:'bat',emoji:'🦇',n:'ค้างคาว'},{id:'penguin',emoji:'🐧',n:'กวิ้น'},{id:'cat',emoji:'🐱',n:'แมว'}];
+const CHARS = [{id:'wolf',emoji:'🐺',n:'หมา'},{id:'sheep',emoji:'🐑',n:'แกะ'},{id:'rabbit',emoji:'🐰',n:'ต่าย'},{id:'bat',emoji:'🦇',n:'ค้างคาว'},{id:'penguin',emoji:'🐧',n:'กวิ้น'},{id:'cat',emoji:'🐱',n:'แมว'},{id:'lizard',emoji:'🦎',n:'กิ้งก่า'},{id:'bison',emoji:'🦬',n:'ไบสัน'},{id:'monkey',emoji:'🐒',n:'ลิง'},{id:'panda',emoji:'🐼',n:'แพนด้า'},{id:'whale',emoji:'🐋',n:'วาฬ'},{id:'mole',emoji:'🦫',n:'ตุ่น'}];
 const DAYS = [{k:'mon',l:'จันทร์',idx:1},{k:'tue',l:'อังคาร',idx:2},{k:'wed',l:'พุธ',idx:3},{k:'thu',l:'พฤหัส',idx:4},{k:'fri',l:'ศุกร์',idx:5},{k:'sat',l:'เสาร์',idx:6},{k:'sun',l:'อาทิตย์',idx:7}];
-const TIMES_LABELS = ['19:00 - 20:00','20:00 - 21:00','21:00 - 22:00','23:00 - 00:00','00:00 - 01:00'];
-const TIMES_KEYS = ['19-20','20-21','21-22','23-24','00-01'];
-const SLOTS = {tue:{'19-20':'77','21-22':'55','23-24':'77'},wed:{'19-20':'55','23-24':'77'},thu:{'20-21':'77','23-24':'55'},fri:{'00-01':'77'},sat:{'00-01':'77'},sun:{'19-20':'55'}};
+const TIMES_LABELS = ['19:00 - 20:00','20:00 - 21:00','21:00 - 22:00','22:00 - 23:00','23:00 - 00:00','00:00 - 01:00'];
+const TIMES_KEYS = ['19-20','20-21','21-22','22-23','23-24','00-01'];
+const SLOTS = {
+  mon:{'19-20':'33','20-21':'zappa','21-22':'1010'},
+  tue:{'19-20':'77','20-21':'zappa','21-22':'55','22-23':'1010','23-24':'77'},
+  wed:{'19-20':'55','20-21':'33','21-22':'1010','23-24':'77'},
+  thu:{'19-20':'33','20-21':'77','21-22':'zappa','22-23':'1010','23-24':'55'},
+  fri:{'19-20':'33','21-22':'1010','00-01':'77'},
+  sat:{'19-20':'zappa','20-21':'33','21-22':'1010','22-23':'1010','00-01':'77'},
+  sun:{'19-20':'55','20-21':'33','22-23':'1010','23-24':'1010'}
+};
+const ARENA_INFO = {
+  '77':  { label:'7v7',   icon:'⚔️',  color:'#42d4f5',      max:7  },
+  '55':  { label:'5v5',   icon:'🛡️',  color:'#42f5a4',      max:5  },
+  '33':  { label:'3v3',   icon:'👊',  color:'#f5a442',      max:3  },
+  'zappa':{ label:'Zappa',icon:'🔧',  color:'#d460f5',      max:12 },
+  '1010':{ label:'10v10', icon:'🌉',  color:'#f55a42',      max:10 }
+};
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 let user = localStorage.getItem('raidUser'), nickname = localStorage.getItem('raidNick') || '';
@@ -277,7 +292,8 @@ function renderSchedule() {
       const type = (SLOTS[day.k] && SLOTS[day.k][t]) || null;
       if(!type) { h += '<td>-</td>'; return; }
       const key = `${day.k}_${t}`, ps = signups.filter(s => s.slot_key === key), isMe = ps.some(s => s.username === user);
-      h += `<td><div class="slot-container"><div style="font-weight:bold; color:var(--gold); font-size:0.8rem;">${type==='77'?'7v7':'5v5'} (${ps.length}/${type==='77'?7:5})</div><div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=(type==='77'?7:5)?'disabled':''}>ลงชื่อเข้า</button><button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ออก</button></div></div></td>`;
+      const a = ARENA_INFO[type];
+      h += `<td><div class="slot-container"><div style="font-weight:bold; color:${a.color}; font-size:0.8rem;">${a.icon} ${a.label} (${ps.length}/${a.max})</div><div class="btn-action-group"><button class="btn-sign btn-in ${isMe?'active-in':''}" onclick="handleJoin('${key}')" ${isMe||ps.length>=a.max?'disabled':''}>ลงชื่อเข้า</button><button class="btn-sign btn-out" onclick="handleLeave('${key}')" ${!isMe?'disabled':''}>ออก</button></div></div></td>`;
     });
     h += '</tr>';
   });
@@ -294,8 +310,11 @@ function renderOverview() {
       html += `<tr class="${day.isToday?'today-row':''}"><td><span style="font-weight:bold; color:var(--gold); font-size:0.9rem;">${day.l}</span><br><span style="font-size:0.65rem; opacity:0.7;">${day.dateStr}</span></td>`;
       TIMES_KEYS.forEach(t => {
         const key = `${day.k}_${t}`, ps = signups.filter(s => s.slot_key === key && String(s.team) === String(num));
+        const type = (SLOTS[day.k] && SLOTS[day.k][t]) || null;
+        const a = type ? ARENA_INFO[type] : null;
+        const typeLabel = a ? `<div style="font-size:0.7rem; font-weight:bold; color:${a.color}; margin-bottom:4px;">${a.icon} ${a.label}</div>` : '';
         let list = ps.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span><span style="font-size:0.65rem; color:var(--cyan)">📞 ${p.phone || '-'}</span>${user==='admin'?`<button class="btn-admin-del" onclick="adminKick('${p.id}')">ลบ</button>`:''}</div>`).join('');
-        html += `<td>${list || '-'}</td>`;
+        html += `<td>${type ? typeLabel + (list || '<span style="font-size:0.75rem; opacity:0.4;">-</span>') : '-'}</td>`;
       });
       html += `</tr>`;
     });
