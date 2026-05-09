@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.06.8A</title>
+<title>12Tails Arena PVP - Rev.06.8B</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -324,6 +324,7 @@ function renderSchedule() {
 }
 
 function renderOverview() {
+  const currentSlot = getCurrentSlotKey();
   const dates = getDates(); let html = '';
   [1, 2, 3].forEach(num => {
     html += `<div class="section-label">ทีม ${num}</div><div class="table-wrapper"><table><thead><tr><th>วัน</th>`;
@@ -336,8 +337,9 @@ function renderOverview() {
         const type = (SLOTS[day.k] && SLOTS[day.k][t]) || null;
         const a = type ? ARENA_INFO[type] : null;
         const typeLabel = a ? `<div style="font-size:0.7rem; font-weight:bold; color:${a.color}; margin-bottom:4px;">${a.icon} ${a.label}</div>` : '';
+        const isCurrentSlot = day.isToday && t === currentSlot;
         let list = ps.map(p => `<div class="player-tag"><span class="player-name">${p.char_emoji} ${p.nickname || p.username}</span><span style="font-size:0.65rem; color:var(--cyan)">📞 ${p.phone || '-'}</span>${user==='admin'?`<button class="btn-admin-del" onclick="adminKick('${p.id}')">ลบ</button>`:''}</div>`).join('');
-        html += `<td>${type ? typeLabel + (list || '<span style="font-size:0.75rem; opacity:0.4;">-</span>') : '-'}</td>`;
+        html += `<td class="${isCurrentSlot?'current-slot':''}">${type ? typeLabel + (list || '<span style="font-size:0.75rem; opacity:0.4;">-</span>') : '-'}</td>`;
       });
       html += `</tr>`;
     });
