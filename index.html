@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.06.7</title>
+<title>12Tails Arena PVP - Rev.06.8</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -233,9 +233,17 @@ window.checkEnter = (e, type) => {
   }
 };
 
+function getWeekKey() {
+  const now = new Date();
+  const day = now.getDay() === 0 ? 6 : now.getDay() - 1; // Monday = 0
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - day);
+  return monday.toISOString().split('T')[0];
+}
+
 async function sync() {
   try {
-    const { data: s } = await supabase.from('signups').select('*'); signups = s || [];
+    const { data: s } = await supabase.from('signups').select('*').eq('week_key', getWeekKey()); signups = s || [];
     const { data: a } = await supabase.from('announcements').select('content').eq('id', 1).maybeSingle();
     if(a) document.getElementById('announce-text').textContent = a.content;
     renderSchedule(); if(document.getElementById('view-list').style.display !== 'none') renderOverview();
@@ -326,7 +334,7 @@ function renderOverview() {
 window.handleJoin = async (key) => {
   if(!selectedChar || !selectedTeam) return showToast("⚠️ เลือกตัวละครและทีมก่อน!");
   if(signups.some(s => s.slot_key === key && s.username === user)) return;
-  await supabase.from('signups').insert([{ slot_key: key, username: user, nickname: nickname, char_id: selectedChar, char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, team: selectedTeam, phone: localStorage.getItem('raidPhone') || '', week_key: new Date().toISOString().split('T')[0] }]);
+  await supabase.from('signups').insert([{ slot_key: key, username: user, nickname: nickname, char_id: selectedChar, char_emoji: CHARS.find(c=>c.id===selectedChar).emoji, team: selectedTeam, phone: localStorage.getItem('raidPhone') || '', week_key: getWeekKey() }]);
   sync();
 };
 window.handleLeave = async (key) => { const has = signups.find(s => s.slot_key === key && s.username === user); if(has) await supabase.from('signups').delete().eq('id', has.id), sync(); };
