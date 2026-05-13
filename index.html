@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>12Tails Arena PVP - Rev.07.1</title>
+<title>12Tails Arena PVP - Rev.06.8</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap');
   
@@ -59,12 +59,12 @@
   .char-card, .team-card { padding: 10px 18px; background: var(--bg-lighter); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
   .char-card.selected, .team-card.selected { border-color: var(--gold); background: rgba(245, 200, 66, 0.2); font-weight: bold; }
   
-  .table-wrapper { overflow-x: auto; background: var(--bg-lighter); border-radius: 15px; border: 1px solid var(--border); margin-bottom: 2rem; }
-  table { width: 100%; border-collapse: collapse; min-width: 1100px; table-layout: fixed; }
-  th { background: var(--bg-darker); color: var(--text-dim); font-size: 0.8rem; padding: 15px 5px; font-family: 'Kanit'; border: 1px solid rgba(255,255,255,0.05); }
-  td { border: 1px solid rgba(255,255,255,0.05); padding: 10px 5px; text-align: center; vertical-align: middle; word-wrap: break-word; }
-  th:first-child, td:first-child { width: 120px; }
-  th:not(:first-child), td:not(:first-child) { width: 196px; }
+  .table-wrapper { background: var(--bg-lighter); border-radius: 15px; border: 1px solid var(--border); margin-bottom: 2rem; width: 100%; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th { background: var(--bg-darker); color: var(--text-dim); font-size: 0.75rem; padding: 12px 3px; font-family: 'Kanit'; border: 1px solid rgba(255,255,255,0.05); }
+  td { border: 1px solid rgba(255,255,255,0.05); padding: 8px 3px; text-align: center; vertical-align: middle; word-wrap: break-word; overflow: hidden; }
+  th:first-child, td:first-child { width: 9%; }
+  th:not(:first-child), td:not(:first-child) { width: 15.1%; }
 
   .date-big { font-size: 0.95rem; font-weight: bold; color: var(--gold); }
   .date-sub { font-size: 0.65rem; opacity: 0.7; color: var(--text-dim); }
@@ -79,8 +79,8 @@
   .btn-out { background: rgba(245, 90, 66, 0.1); color: var(--red); border: 1px solid rgba(245, 90, 66, 0.3); }
   .active-in { background: var(--green) !important; color: #000 !important; }
 
-  .player-tag { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-darker); padding: 6px 10px; border-radius: 8px; margin: 4px auto; font-size: 0.75rem; border-left: 3px solid var(--gold); position: relative; width: 95%; max-width: 170px; text-align: left; }
-  .player-name { font-weight: bold; color: #fff; font-size: 0.8rem; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+  .player-tag { display: flex; flex-direction: column; align-items: flex-start; background: var(--bg-darker); padding: 5px 7px; border-radius: 8px; margin: 3px auto; font-size: 0.68rem; border-left: 3px solid var(--gold); position: relative; width: 97%; text-align: left; }
+  .player-name { font-weight: bold; color: #fff; font-size: 0.72rem; overflow: hidden; text-overflow: ellipsis; width: 100%; }
   .btn-admin-del { position: absolute; right: 4px; top: 4px; background: var(--red); color: white; border: none; border-radius: 4px; font-size: 0.6rem; cursor: pointer; padding: 2px 4px; }
   
   .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 12px 24px; border-radius: 50px; font-weight: bold; display: none; z-index: 100; }
