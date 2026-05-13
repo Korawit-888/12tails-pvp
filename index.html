@@ -291,6 +291,11 @@ window.updateProfile = async () => { const n=document.getElementById('p-nick').v
 async function loadUsersAdmin() { const {data} = await supabase.from('users').select('*'); let h = ''; data.forEach(u => { if(u.username === 'admin') return; h += `<div class="admin-item"><span><strong>${u.username}</strong> (${u.nickname})</span><div><button onclick="editUserAdmin('${u.username}','${u.nickname}','${u.phone}')" style="background:var(--cyan); border:none; padding:5px; border-radius:5px; cursor:pointer;">แก้</button><button onclick="delUserAdmin('${u.username}')" style="background:var(--red); border:none; padding:5px; border-radius:5px; cursor:pointer; margin-left:5px; color:white;">ลบ</button></div></div>`; }); document.getElementById('admin-user-list').innerHTML = h; }
 window.editUserAdmin = async (t,n,ph) => { const nn=prompt("ชื่อเล่น:",n), pp=prompt("เบอร์:",ph), pw=prompt("รหัสใหม่:", ""); const up={nickname:nn,phone:pp}; if(pw) up.password=btoa(pw); await supabase.from('users').update(up).eq('username',t); loadUsersAdmin(); };
 window.delUserAdmin = async (t) => { if(confirm("ลบผู้ใช้?")) await supabase.from('users').delete().eq('username',t), loadUsersAdmin(); };
+window.adminClearTeam = async (num) => {
+  if(!confirm(`ลบรายชื่อทั้งหมดในทีม ${num} สัปดาห์นี้?`)) return;
+  await supabase.from('signups').delete().eq('team', String(num)).eq('week_key', getWeekKey());
+  sync();
+};
 window.adminKick = async (id) => { if(confirm("ลบรายชื่อนี้?")) await supabase.from('signups').delete().eq('id', id), sync(); };
 
 // Arena Logic[cite: 1]
@@ -333,7 +338,8 @@ function renderOverview() {
   const currentSlot = getCurrentSlotKey();
   const dates = getDates(); let html = '';
   [1, 2, 3].forEach(num => {
-    html += `<div class="section-label">ทีม ${num}</div><div class="table-wrapper"><table><thead><tr><th>วัน</th>`;
+    const adminBtn = user === 'admin' ? `<button onclick="adminClearTeam(${num})" style="margin-left:12px; padding:4px 12px; background:rgba(245,90,66,0.15); color:var(--red); border:1px solid rgba(245,90,66,0.4); border-radius:6px; font-family:'Kanit'; font-size:0.75rem; cursor:pointer;">🗑️ Clear All ทีม ${num}</button>` : '';
+    html += `<div class="section-label">ทีม ${num}${adminBtn}</div><div class="table-wrapper"><table><thead><tr><th>วัน</th>`;
     TIMES_LABELS.forEach(t => html += `<th>${t}</th>`);
     html += `</tr></thead><tbody>`;
     dates.forEach(day => {
